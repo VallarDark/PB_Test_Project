@@ -1,14 +1,20 @@
 ﻿using Contracts;
-using Microsoft.FSharp.Core;
+using System.Threading.Tasks;
 
 namespace Domain.Agregates.UserAgregate
 {
     public interface IUserService
     {
-        Unit Create(User item);
+        User? CurrentUser { get; }
 
-        User Get(string id);
+        Task<string> RegisterCasualUser(UserDto item);
 
-        PaginatedCollectionBase<User> GetAll(int pageNumber);
+        Task<string> RegisterAdminUser(UserDto item);
+
+        Task<string> LoginUser(UserDto item);
+
+        Task<User?> VerifyUserByPersonalData(PersonalData personalData);
+
+        Task<PaginatedCollectionBase<User>> GetAllUsers(int pageNumber);
     }
 }

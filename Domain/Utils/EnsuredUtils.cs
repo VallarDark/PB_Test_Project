@@ -1,28 +1,27 @@
-﻿using Contracts;
-using Domain.Exceptions;
+﻿using Domain.Exceptions;
 using Microsoft.FSharp.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
 namespace Domain.Utils
 {
     public static class EnsuredUtils
     {
-        const string DEFAULT_STRING_NOT_EMPTY_ERROR = "Parameter can't be null or empty";
-        const string DEFAULT_STRING_LENGTH_ERROR = "Parameter length is not valid";
-        const string DEFAULT_STRING_NOT_MATCH_PATTERN_ERROR = "Parameter should match the pattern";
-        const string DEFAULT_NOT_NULL_ERROR = "Parameter can't be null";
-        const string DEFAULT_NOT_EMPTY_COLLECTION_ERROR = "Collection can't be empty or null";
-        const string DEFAULT_WRONG_COLLECTION_ITEMS_COUNT_ERROR = "Wrong collection items count";
-        const string DEFAULT_NOMBER_IS_NON_NEGATIVE_ERROR = "Parameter can't be less than 0";
-        const string DEFAULT_NOMBER_IS_LESS_THEN_VALUE_ERROR = "Parameter can't be less then value";
-        const string DEFAULT_NOMBER_IS_MORE_THEN_VALUE_ERROR = "Parameter can't be more then value";
-        const string DEFAULT_ITEM_SHOULD_EXISTS_ERROR = "Current item does not exist";
-        const string DEFAULT_ITEM_SHOULD_NOT_EXISTS_ERROR = "Item with same data already exists";
-        const string DEFAULT_SAME_DATA_PARAM_ERROR = "Current element data is the same with new value";
+        private const string DEFAULT_STRING_NOT_EMPTY_ERROR = "Parameter can't be null or empty";
+        private const string DEFAULT_STRING_LENGTH_ERROR = "Parameter length is not valid";
+        private const string DEFAULT_PASSWORD_VALIDATION_ERROR = "Password is not valid";
+        private const string DEFAULT_STRING_NOT_MATCH_PATTERN_ERROR = "Parameter should match the pattern";
+        private const string DEFAULT_NOT_NULL_ERROR = "Parameter can't be null";
+        private const string DEFAULT_NOT_EMPTY_COLLECTION_ERROR = "Collection can't be empty or null";
+        private const string DEFAULT_DUPLICATE_COLLECTION_ITEM_ERROR = "Collection already contains this item";
+        private const string DEFAULT_COLLECTION_ITEM_NOT_EXISTS_ERROR = "This item not exists in collection";
+        private const string DEFAULT_WRONG_COLLECTION_ITEMS_COUNT_ERROR = "Wrong collection items count";
+        private const string DEFAULT_NOMBER_IS_NON_NEGATIVE_ERROR = "Parameter can't be less than 0";
+        private const string DEFAULT_NOMBER_IS_LESS_THEN_VALUE_ERROR = "Parameter can't be less then value";
+        private const string DEFAULT_NOMBER_IS_MORE_THEN_VALUE_ERROR = "Parameter can't be more then value";
+        private const string DEFAULT_SAME_DATA_PARAM_ERROR = "Current element data is the same with new value";
 
         public static string EnsureStringIsNotEmptyAndMathPattern(
             string data,
@@ -63,6 +62,19 @@ namespace Domain.Utils
             {
                 throw new ArgumentException(errorMsg);
             }
+
+            return data;
+        }
+
+        public static string EnsurePasswordIsCorrect(
+            string data,
+            int minLength,
+            int maxLength,
+            Regex pattern,
+            string errorMsg = DEFAULT_PASSWORD_VALIDATION_ERROR)
+        {
+            EnsureStringLengthIsCorrect(data, minLength, maxLength, errorMsg);
+            EnsureStringIsNotEmptyAndMathPattern(data, pattern, errorMsg);
 
             return data;
         }
@@ -108,34 +120,34 @@ namespace Domain.Utils
             return collection;
         }
 
-        public static Unit EnsureItemNotExists<T>(
-           IReadeableRepository<T> repository,
-           Expression<Func<T, bool>> predicate,
-           string errorMsg = DEFAULT_ITEM_SHOULD_NOT_EXISTS_ERROR) where T : EntityBase
+        public static IEnumerable<T> EnsureCollectionNotContainsItem<T>(
+           IEnumerable<T> collection,
+           T item,
+           string errorMsg = DEFAULT_DUPLICATE_COLLECTION_ITEM_ERROR)
         {
-            var existedData = repository.Get(predicate);
+            EnsureNotNull(collection, errorMsg);
 
-            if (existedData != null)
+            if (collection.Any(i => i.Equals(item)))
             {
-                throw new ItemAlreadyExistsException(errorMsg);
+                throw new ArgumentException(errorMsg);
             }
 
-            return default(Unit);
+            return collection;
         }
 
-        public static T EnsureItemExists<T>(
-          IReadeableRepository<T> repository,
-          Expression<Func<T, bool>> predicate,
-          string errorMsg = DEFAULT_ITEM_SHOULD_EXISTS_ERROR) where T : EntityBase
+        public static IEnumerable<T> EnsureCollectionContainsItem<T>(
+           IEnumerable<T> collection,
+           T item,
+           string errorMsg = DEFAULT_COLLECTION_ITEM_NOT_EXISTS_ERROR)
         {
-            var existedData = repository.Get(predicate);
+            EnsureNotNull(collection, errorMsg);
 
-            if (existedData == null)
+            if (!collection.Contains(item))
             {
-                throw new ItemNotExistsException(errorMsg);
+                throw new ArgumentException(errorMsg);
             }
 
-            return existedData;
+            return collection;
         }
 
         public static Unit EnsureNewValueIsNotSame<T>(

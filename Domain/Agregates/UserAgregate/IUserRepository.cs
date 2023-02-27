@@ -2,7 +2,7 @@
 
 namespace Domain.Agregates.UserAgregate
 {
-    public interface IUserRepository : IRepository<User>
+    public interface IUserRepository : IRepository<User>, IResolvable
     {
     }
 }

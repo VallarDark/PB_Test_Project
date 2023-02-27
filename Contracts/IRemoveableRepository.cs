@@ -1,9 +1,10 @@
 ﻿using Microsoft.FSharp.Core;
+using System.Threading.Tasks;
 
 namespace Contracts
 {
     public interface IRemoveableRepository<T> where T : EntityBase
     {
-        Unit Delete(string id);
+        Task<Unit> Delete(string id);
     }
 }

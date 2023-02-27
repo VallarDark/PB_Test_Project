@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Contracts
 {
     public interface IReadeableRepository<T> where T : EntityBase
     {
-        T? GetById(string id, Expression<Func<T, bool>>? predicate = null);
+        Task<T?> GetById(string id, Expression<Func<T, bool>>? predicate = null);
 
-        T? Get(Expression<Func<T, bool>>? predicate = null);
+        Task<T?> Get(Expression<Func<T, bool>>? predicate = null);
 
-        PaginatedCollectionBase<T> GetAll(int pageNumber, int itemsPerPage, Func<bool, T>? predicate = null);
+        Task<PaginatedCollectionBase<T>> GetAll(int pageNumber, int itemsPerPage, Func<bool, T>? predicate = null);
+
+        Task<PaginatedCollectionBase<T>> GetAll(Func<bool, T>? predicate = null);
     }
 }

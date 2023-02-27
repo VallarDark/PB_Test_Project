@@ -3,37 +3,45 @@ using Domain.Agregates.UserAgregate;
 using Microsoft.FSharp.Core;
 using System;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Persistence.Dapper
 {
     public class DapperUserRepository : IUserRepository
     {
-        public Unit Create(User item)
+        public string ServiceType => RepositoryType.Dapper.ToString();
+
+        public Task<Unit> Create(User item)
         {
             throw new NotImplementedException();
         }
 
-        public Unit Delete(string id)
+        public Task<Unit> Delete(string id)
         {
             throw new NotImplementedException();
         }
 
-        public User Get(Expression<Func<User, bool>> predicate = null)
+        public Task<User> Get(Expression<Func<User, bool>> predicate = null)
         {
             throw new NotImplementedException();
         }
 
-        public PaginatedCollectionBase<User> GetAll(int pageNumber, int itemsPerPage, Func<bool, User> predicate = null)
+        public Task<PaginatedCollectionBase<User>> GetAll(int pageNumber, int itemsPerPage, Func<bool, User> predicate = null)
         {
             throw new NotImplementedException();
         }
 
-        public User GetById(string id, Expression<Func<User, bool>> predicate = null)
+        public Task<PaginatedCollectionBase<User>> GetAll(Func<bool, User> predicate = null)
         {
             throw new NotImplementedException();
         }
 
-        public Unit Update(User item)
+        public Task<User> GetById(string id, Expression<Func<User, bool>> predicate = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Unit> Update(User item)
         {
             throw new NotImplementedException();
         }

@@ -24,14 +24,12 @@ namespace Domain.Agregates.UserAgregate
 
         public string LastName { get; private set; }
 
-        public string UserId { get; private set; }
 
-        public PersonalData(string email, string name, string lastName, string userId)
+        public PersonalData(string email, string name, string lastName)
         {
             Email = EnsuredUtils.EnsureStringIsNotEmptyAndMathPattern(email, _emailPattern);
             Name = EnsuredUtils.EnsureStringLengthIsCorrect(name, MIN_LENGHT, MAX_LENGTH);
             LastName = EnsuredUtils.EnsureStringLengthIsCorrect(lastName, MIN_LENGHT, MAX_LENGTH);
-            UserId = EnsuredUtils.EnsureStringIsNotEmpty(userId);
         }
 
         protected override IEnumerable<object> GetEqualityComponents()

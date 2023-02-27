@@ -1,11 +1,12 @@
 ﻿using Microsoft.FSharp.Core;
+using System.Threading.Tasks;
 
 namespace Contracts
 {
     public interface IWriteableRepository<T> where T : EntityBase
     {
-        Unit Create(T item);
+        Task<Unit> Create(T item);
 
-        Unit Update(T item);
+        Task<Unit> Update(T item);
     }
 }
