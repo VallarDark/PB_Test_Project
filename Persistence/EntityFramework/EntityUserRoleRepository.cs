@@ -13,18 +13,11 @@ using System.Threading.Tasks;
 
 namespace Persistence.EntityFramework
 {
-    public class EntityUserRoleRepository : IUserRoleRepository
+    public class EntityUserRoleRepository : EntityRepositoryBase, IUserRoleRepository
     {
-        private readonly PbDbContext _db;
-        private readonly IMapper _mapper;
-
-        public EntityUserRoleRepository(PbDbContext db, IMapper mapper)
+        public EntityUserRoleRepository(PbDbContext db, IMapper mapper) : base(db, mapper)
         {
-            _db = db;
-            _mapper = mapper;
         }
-
-        public string ServiceType => RepositoryType.EntityFramework.ToString();
 
         public async Task<UserRole?> Get(Expression<Func<UserRole, bool>>? predicate = null)
         {
@@ -32,13 +25,13 @@ namespace Persistence.EntityFramework
 
             if (predicate == null)
             {
-                result = await _db.Roles.FirstOrDefaultAsync();
+                result = await _Db.Roles.FirstOrDefaultAsync();
             }
             else
             {
-                var mappedPredicate = _mapper.Map<Expression<Func<UserRoleEntity, bool>>>(predicate);
+                var mappedPredicate = _Mapper.Map<Expression<Func<UserRoleEntity, bool>>>(predicate);
 
-                result = await _db.Roles.FirstOrDefaultAsync(mappedPredicate);
+                result = await _Db.Roles.FirstOrDefaultAsync(mappedPredicate);
             }
 
             if (result == null)
@@ -46,7 +39,7 @@ namespace Persistence.EntityFramework
                 return null;
             }
 
-            return new UserRole(_mapper.Map<UserRoleDto>(result));
+            return new UserRole(_Mapper.Map<UserRoleDto>(result));
         }
 
         public async Task<PaginatedCollectionBase<UserRole>> GetAll(
@@ -63,21 +56,21 @@ namespace Persistence.EntityFramework
 
             if (predicate == null)
             {
-                result = _db.Roles
+                result = _Db.Roles
                     .Skip(skipItems)
                     .Take(itemsPerPage);
             }
             else
             {
-                var mappedPredicate = _mapper.Map<Expression<Func<UserRoleEntity, bool>>>(predicate);
+                var mappedPredicate = _Mapper.Map<Expression<Func<UserRoleEntity, bool>>>(predicate);
 
-                result = _db.Roles
+                result = _Db.Roles
                         .Where(mappedPredicate)
                         .Skip(skipItems)
                         .Take(itemsPerPage);
             }
 
-            var collection = await result.Select(u => new UserRole(_mapper.Map<UserRoleDto>(u)))
+            var collection = await result.Select(u => new UserRole(_Mapper.Map<UserRoleDto>(u)))
                 .ToListAsync();
 
             return new PaginatedCollection<UserRole>(collection, collection.Count == itemsPerPage);
@@ -89,28 +82,28 @@ namespace Persistence.EntityFramework
 
             if (predicate == null)
             {
-                result = _db.Roles;
+                result = _Db.Roles;
             }
             else
             {
-                var mappedPredicate = _mapper.Map<Expression<Func<UserRoleEntity, bool>>>(predicate);
+                var mappedPredicate = _Mapper.Map<Expression<Func<UserRoleEntity, bool>>>(predicate);
 
-                result = _db.Roles.Where(mappedPredicate);
+                result = _Db.Roles.Where(mappedPredicate);
             }
-            return await result.Select(u => new UserRole(_mapper.Map<UserRoleDto>(u)))
+            return await result.Select(u => new UserRole(_Mapper.Map<UserRoleDto>(u)))
                 .ToListAsync();
         }
 
         public async Task<UserRole?> GetById(string id)
         {
-            var result = await _db.Roles.FirstOrDefaultAsync(ur => ur.Id == id);
+            var result = await _Db.Roles.FirstOrDefaultAsync(ur => ur.Id == id);
 
             if (result == null)
             {
                 return null;
             }
 
-            return new UserRole(_mapper.Map<UserRoleDto>(result));
+            return new UserRole(_Mapper.Map<UserRoleDto>(result));
         }
     }
 }

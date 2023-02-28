@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using Domain.Utils;
 using Microsoft.FSharp.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,9 +14,9 @@ namespace Domain.Agregates.ProductAgregate
         private const int MAX_DESCRIPTION_LENGTH = 500;
         private const int MAX_URL_LENGTH = 50;
 
-        private ICollection<ProductCategory> categories;
+        private ICollection<ProductCategory> categories = new List<ProductCategory>();
 
-        private string id = string.Empty;
+        private string id = Guid.NewGuid().ToString();
 
         public string Id => id;
 
@@ -41,6 +42,16 @@ namespace Domain.Agregates.ProductAgregate
             Description = EnsuredUtils.EnsureStringLengthIsCorrect(description, MIN_LENGTH, MAX_DESCRIPTION_LENGTH);
             ImgUrl = EnsuredUtils.EnsureStringLengthIsCorrect(imgUrl, MIN_LENGTH, MAX_URL_LENGTH);
             Price = EnsuredUtils.EnsureNumberIsMoreOrEqualValue(price, 0);
+        }
+
+        public Product(ProductDto productDto)
+        {
+            id = EnsuredUtils.EnsureStringIsNotEmpty(productDto.Id);
+            Title = EnsuredUtils.EnsureStringLengthIsCorrect(productDto.Title, MIN_LENGTH, MAX_LENGTH);
+            categories = EnsuredUtils.EnsureNotNull(productDto.Categories.Select(c => new ProductCategory(c)).ToList());
+            Description = EnsuredUtils.EnsureStringLengthIsCorrect(productDto.Description, MIN_LENGTH, MAX_DESCRIPTION_LENGTH);
+            ImgUrl = EnsuredUtils.EnsureStringLengthIsCorrect(productDto.ImgUrl, MIN_LENGTH, MAX_URL_LENGTH);
+            Price = EnsuredUtils.EnsureNumberIsMoreOrEqualValue(productDto.Price, 0);
         }
 
         public Unit ChangeDescription(string description)

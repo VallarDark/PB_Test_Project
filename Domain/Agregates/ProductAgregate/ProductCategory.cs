@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using Domain.Utils;
 using Microsoft.FSharp.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,9 +13,9 @@ namespace Domain.Agregates.ProductAgregate
         private const int MAX_LENGTH = 25;
         private const int MAX_DESCRIPTION_LENGTH = 500;
 
-        private ICollection<Product> products;
+        private ICollection<Product> products = new List<Product>();
 
-        private string id = string.Empty;
+        private string id = Guid.NewGuid().ToString();
 
         public string Id => id;
 
@@ -29,6 +30,14 @@ namespace Domain.Agregates.ProductAgregate
             Name = EnsuredUtils.EnsureStringLengthIsCorrect(name, MIN_LENGTH, MAX_LENGTH);
             this.products = EnsuredUtils.EnsureNotNull(products);
             Description = EnsuredUtils.EnsureStringLengthIsCorrect(description, MIN_LENGTH, MAX_DESCRIPTION_LENGTH);
+        }
+
+        public ProductCategory(ProductCategoryDto categoryDto)
+        {
+            id = EnsuredUtils.EnsureStringIsNotEmpty(categoryDto.Id);
+            Name = EnsuredUtils.EnsureStringLengthIsCorrect(categoryDto.Name, MIN_LENGTH, MAX_LENGTH);
+            products = EnsuredUtils.EnsureNotNull(categoryDto.Products.Select(p => new Product(p)).ToList());
+            Description = EnsuredUtils.EnsureStringLengthIsCorrect(categoryDto.Description, MIN_LENGTH, MAX_DESCRIPTION_LENGTH);
         }
 
         public Unit ChangeName(string name)

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Domain.Agregates.ProductAgregate;
 using Domain.Agregates.UserAgregate;
 using Persistence.Entities;
 
@@ -29,6 +30,17 @@ namespace Persistence.Mapper
             CreateMap<UserRoleEntity, UserRoleDto>()
             .ReverseMap();
 
+            CreateMap<Product, ProductEntity>()
+            .ReverseMap();
+
+            CreateMap<ProductCategory, ProductCategoryEntity>()
+            .ReverseMap();
+
+            CreateMap<ProductEntity, ProductDto>()
+            .ReverseMap();
+
+            CreateMap<ProductCategoryEntity, ProductCategoryDto>()
+            .ReverseMap();
         }
     }
 }

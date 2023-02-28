@@ -1,4 +1,5 @@
-﻿using Domain.Agregates.UserAgregate;
+﻿using Domain.Agregates.ProductAgregate;
+using Domain.Agregates.UserAgregate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Persistence.Entities;
@@ -9,6 +10,14 @@ namespace Persistence.EntityFramework.Context
     public class PbDbContext : DbContext
     {
         private readonly IConfiguration _configuration;
+
+        public virtual DbSet<UserEntity> Users { get; set; }
+
+        public virtual DbSet<UserRoleEntity> Roles { get; set; }
+
+        public virtual DbSet<ProductCategoryEntity> Categories { get; set; }
+
+        public virtual DbSet<ProductEntity> Products { get; set; }
 
         public PbDbContext(IConfiguration configuration)
         {
@@ -23,21 +32,23 @@ namespace Persistence.EntityFramework.Context
                 .HasOne(s => s.Role)
                 .WithMany(c => c.Users);
 
+            modelBuilder.Entity<ProductEntity>()
+                .HasMany(p => p.Categories)
+                .WithMany(c => c.Products);
+
             modelBuilder.Entity<UserRoleEntity>()
                 .HasData(
+                    new UserRoleEntity()
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        RoleType = UserRoleType.User
+                    },
 
-                new UserRoleEntity()
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    RoleType = UserRoleType.User
-                },
-
-                new UserRoleEntity()
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    RoleType = UserRoleType.Admin
-                }
-
+                    new UserRoleEntity()
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        RoleType = UserRoleType.Admin
+                    }
                 );
         }
 
@@ -46,8 +57,6 @@ namespace Persistence.EntityFramework.Context
             optionsBuilder.UseSqlite($@"Data Source={_configuration["Db:DataSource"]}", b => b.MigrationsAssembly("PB_WebApi"));
         }
 
-        public virtual DbSet<UserEntity> Users { get; set; }
 
-        public virtual DbSet<UserRoleEntity> Roles { get; set; }
     }
 }

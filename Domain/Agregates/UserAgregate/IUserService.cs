@@ -8,6 +8,8 @@ namespace Domain.Agregates.UserAgregate
     {
         User? CurrentUser { get; }
 
+        RepositoryType RepositoryType { get; set; }
+
         Task<string> RegisterCasualUser(UserRegistrationDto userData);
 
         Task<string> RegisterAdminUser(UserRegistrationDto userData);

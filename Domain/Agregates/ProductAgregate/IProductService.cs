@@ -6,17 +6,23 @@ namespace Domain.Agregates.ProductAgregate
 {
     public interface IProductService
     {
-        Task<ProductCategory> CreateCategory(ProductCategory category);
+        RepositoryType RepositoryType { get; set; }
 
-        Task<Product> CreateProduct(Product product);
+        Task<ProductCategory> CreateCategory(ProductCategoryChangeDto category);
 
-        Task<ProductCategory> UpdateCategory(ProductCategory category);
+        Task<Product> CreateProduct(ProductChangeDto product);
 
-        Task<Product> UpdateProduct(Product product);
+        Task<ProductCategory> UpdateCategory(ProductCategoryChangeDto category);
+
+        Task<Product> UpdateProduct(ProductChangeDto product);
 
         Task<Unit> RemoveCategory(string id);
 
         Task<Unit> RemoveProduct(string id);
+
+        Task<Unit> AddProductToCategory(string productId, string categoryId);
+
+        Task<Unit> RemoveProductFromCategory(string productId, string categoryId);
 
         Task<PaginatedCollectionBase<Product>> GetProducts(int pageNumber);
 

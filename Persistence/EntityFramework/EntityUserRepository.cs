@@ -15,32 +15,25 @@ using System.Threading.Tasks;
 
 namespace Persistence.EntityFramework
 {
-    public class EntityUserRepository : IUserRepository
+    public class EntityUserRepository : EntityRepositoryBase, IUserRepository
     {
         private const string ITEM_NOT_EXISTS_EXCEPTION = "Current {0} does not exists";
 
-        private readonly PbDbContext _db;
-        private readonly IMapper _mapper;
-
-        public EntityUserRepository(PbDbContext db, IMapper mapper)
+        public EntityUserRepository(PbDbContext db, IMapper mapper) : base(db, mapper)
         {
-            _db = db;
-            _mapper = mapper;
         }
-
-        public string ServiceType => RepositoryType.EntityFramework.ToString();
 
         public async Task<Unit> Create(User item)
         {
             var entity = new UserEntity(item);
 
-            var dbRole = await _db.Roles.FirstAsync(r => r.Id == item.Role.Id);
+            var dbRole = await _Db.Roles.FirstAsync(r => r.Id == item.Role.Id);
 
             entity.Role = dbRole;
 
-            _db.Add(entity);
+            _Db.Add(entity);
 
-            await _db.SaveChangesAsync();
+            await _Db.SaveChangesAsync();
 
             return default;
         }
@@ -54,9 +47,9 @@ namespace Persistence.EntityFramework
                 throw new ItemNotExistsException(string.Format(ITEM_NOT_EXISTS_EXCEPTION, nameof(User)));
             }
 
-            _db.Remove(item);
+            _Db.Remove(item);
 
-            await _db.SaveChangesAsync();
+            await _Db.SaveChangesAsync();
 
             return default;
         }
@@ -67,13 +60,13 @@ namespace Persistence.EntityFramework
 
             if (predicate == null)
             {
-                result = await _db.Users.Include(u => u.Role).FirstOrDefaultAsync();
+                result = await _Db.Users.Include(u => u.Role).FirstOrDefaultAsync();
             }
             else
             {
-                var mappedPredicate = _mapper.Map<Expression<Func<UserEntity, bool>>>(predicate);
+                var mappedPredicate = _Mapper.Map<Expression<Func<UserEntity, bool>>>(predicate);
 
-                result = await _db.Users.Include(u => u.Role).FirstOrDefaultAsync(mappedPredicate);
+                result = await _Db.Users.Include(u => u.Role).FirstOrDefaultAsync(mappedPredicate);
             }
 
             if (result == null)
@@ -81,7 +74,7 @@ namespace Persistence.EntityFramework
                 return null;
             }
 
-            return new User(_mapper.Map<UserDto>(result));
+            return new User(_Mapper.Map<UserDto>(result));
         }
 
         public async Task<PaginatedCollectionBase<User>> GetAll(int pageNumber, int itemsPerPage, Expression<Func<User, bool>>? predicate = null)
@@ -95,21 +88,21 @@ namespace Persistence.EntityFramework
 
             if (predicate == null)
             {
-                result = _db.Users.Include(u => u.Role)
+                result = _Db.Users.Include(u => u.Role)
                     .Skip(skipItems)
                     .Take(itemsPerPage);
             }
             else
             {
-                var mappedPredicate = _mapper.Map<Expression<Func<UserEntity, bool>>>(predicate);
+                var mappedPredicate = _Mapper.Map<Expression<Func<UserEntity, bool>>>(predicate);
 
-                result = _db.Users.Include(u => u.Role)
+                result = _Db.Users.Include(u => u.Role)
                         .Where(mappedPredicate)
                         .Skip(skipItems)
                         .Take(itemsPerPage);
             }
 
-            var collection = await result.Select(u => new User(_mapper.Map<UserDto>(u))).ToListAsync();
+            var collection = await result.Select(u => new User(_Mapper.Map<UserDto>(u))).ToListAsync();
 
             return new PaginatedCollection<User>(collection, collection.Count == itemsPerPage);
         }
@@ -120,33 +113,33 @@ namespace Persistence.EntityFramework
 
             if (predicate == null)
             {
-                result = _db.Users.Include(u => u.Role);
+                result = _Db.Users.Include(u => u.Role);
             }
             else
             {
-                var mappedPredicate = _mapper.Map<Expression<Func<UserEntity, bool>>>(predicate);
+                var mappedPredicate = _Mapper.Map<Expression<Func<UserEntity, bool>>>(predicate);
 
-                result = _db.Users.Include(u => u.Role).Where(mappedPredicate);
+                result = _Db.Users.Include(u => u.Role).Where(mappedPredicate);
             }
 
-            return await result.Select(u => new User(_mapper.Map<UserDto>(u))).ToListAsync();
+            return await result.Select(u => new User(_Mapper.Map<UserDto>(u))).ToListAsync();
         }
 
         public async Task<User?> GetById(string id)
         {
-            var result = await _db.Users.Include(u => u.Role).FirstOrDefaultAsync();
+            var result = await _Db.Users.Include(u => u.Role).FirstOrDefaultAsync();
 
             if (result == null)
             {
                 return null;
             }
 
-            return new User(_mapper.Map<UserDto>(result));
+            return new User(_Mapper.Map<UserDto>(result));
         }
 
         public async Task<Unit> Update(User item)
         {
-            var existingUser = await _db.Users.Include(u => u.Role)
+            var existingUser = await _Db.Users.Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Id == item.Id);
 
             if (existingUser == null)
@@ -156,7 +149,7 @@ namespace Persistence.EntityFramework
 
             if (existingUser.Role.RoleType != item.Role.RoleType)
             {
-                var dbRole = await _db.Roles.FirstAsync(r => r.Id == item.Role.Id);
+                var dbRole = await _Db.Roles.FirstAsync(r => r.Id == item.Role.Id);
 
                 if (dbRole == null)
                 {
@@ -168,9 +161,9 @@ namespace Persistence.EntityFramework
 
             existingUser.Update(item);
 
-            _db.Users.Update(existingUser);
+            _Db.Users.Update(existingUser);
 
-            await _db.SaveChangesAsync();
+            await _Db.SaveChangesAsync();
 
             return default;
         }
