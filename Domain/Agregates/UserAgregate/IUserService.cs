@@ -1,4 +1,5 @@
 ﻿using Contracts;
+using Microsoft.FSharp.Core;
 using System.Threading.Tasks;
 
 namespace Domain.Agregates.UserAgregate
@@ -7,14 +8,16 @@ namespace Domain.Agregates.UserAgregate
     {
         User? CurrentUser { get; }
 
-        Task<string> RegisterCasualUser(UserDto item);
+        Task<string> RegisterCasualUser(UserRegistrationDto userData);
 
-        Task<string> RegisterAdminUser(UserDto item);
+        Task<string> RegisterAdminUser(UserRegistrationDto userData);
 
-        Task<string> LoginUser(UserDto item);
+        Task<string> LoginUser(UserLoginDto userData);
 
-        Task<User?> VerifyUserByPersonalData(PersonalData personalData);
+        Task<User?> VerifyUser(UserValidationDto userValidationData);
 
         Task<PaginatedCollectionBase<User>> GetAllUsers(int pageNumber);
+
+        Task<Unit> UpdateUserRole(string userId, UserRoleType roleType);
     }
 }

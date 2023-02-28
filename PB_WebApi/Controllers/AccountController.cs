@@ -24,7 +24,7 @@ namespace PB_WebApi.Controllers
         [AllowAnonymous]
         public async Task<IResult> Registration(UserRegistrationModel registrationModel)
         {
-            var userDto = new UserDto()
+            var userRegistrationDto = new UserRegistrationDto()
             {
                 Email = registrationModel.Email,
                 LastName = registrationModel.LastName,
@@ -33,7 +33,7 @@ namespace PB_WebApi.Controllers
                 Password = registrationModel.Password
             };
 
-            var result = await _userService.RegisterCasualUser(userDto);
+            var result = await _userService.RegisterCasualUser(userRegistrationDto);
 
             return Results.Ok(result);
         }
@@ -42,31 +42,15 @@ namespace PB_WebApi.Controllers
         [AllowAnonymous]
         public async Task<IResult> Login(UserLoginModel loginModel)
         {
-            var userDto = new UserDto()
+            var userLoginDto = new UserLoginDto()
             {
                 Email = loginModel.Email,
                 Password = loginModel.Password
             };
 
-            var result = await _userService.LoginUser(userDto);
+            var result = await _userService.LoginUser(userLoginDto);
 
             return Results.Ok(result);
         }
-
-        [HttpGet("Unauthorized")]
-        [AllowAnonymous]
-        public IResult Unauthorized()
-        {
-            return Results.Content("You should authorize");
-        }
-
-        [HttpGet("Fallback")]
-        [AllowAnonymous]
-        public IResult Fallback()
-        {
-            return Results.Content("Something gone wrong)");
-        }
-
-
     }
 }

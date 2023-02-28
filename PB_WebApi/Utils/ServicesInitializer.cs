@@ -1,6 +1,7 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Contracts;
 using Domain.Agregates.UserAgregate;
+using Domain.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -11,7 +12,6 @@ using Services;
 using Services.UserAgregate;
 using Services.Utils;
 using System.Reflection;
-using System.Text;
 
 namespace WebApi.Utils
 {
@@ -67,42 +67,40 @@ namespace WebApi.Utils
         }
 
         /// <summary>
-        /// Add Jwt AddAuthentication to Service collection
+        /// Add JWT AddAuthentication to Service collection
         /// </summary>
         /// <param name="services">Service collection</param>
         /// <param name="configuration">Project configuration</param>
         /// <returns>Service collection</returns>
         public static IServiceCollection AddConfiguredAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
+            var scheme = JwtBearerDefaults.AuthenticationScheme;
+
             services.AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = scheme;
+                options.DefaultChallengeScheme = scheme;
+                options.DefaultScheme = scheme;
             })
             .AddScheme<JwtBearerOptions, UserJwtAuthenticationHandler>(
-            JwtBearerDefaults.AuthenticationScheme,
-            JwtBearerDefaults.AuthenticationScheme,
+            scheme,
+            scheme,
             o =>
             {
                 o.SaveToken = true;
 
                 o.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidIssuer = configuration["Jwt:Issuer"],
-                    ValidAudience = configuration["Jwt:Audience"],
+                    ValidIssuer = configuration["JWT:Issuer"],
+                    ValidAudience = configuration["JWT:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey
-                    (Encoding.UTF8.GetBytes(configuration["Jwt:Key"])),
+                    (EncodingUtils.DataEncoding.GetBytes(configuration["JWT:Key"] ?? string.Empty)),
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true
                 };
-            })
-            .AddCookie(options =>
-             {
-                 options.LoginPath = "/Account/Unauthorized/";
-             });
+            });
 
             return services;
         }
@@ -119,9 +117,12 @@ namespace WebApi.Utils
                 options.FallbackPolicy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
                     .Build();
+
+                options.AddPolicy("AdminRole", p => p.AddRequirements(new UserRoleRequirement(UserRoleType.Admin)));
+                options.AddPolicy("UserRole", p => p.AddRequirements(new UserRoleRequirement(UserRoleType.User)));
             });
 
-            //services.AddScoped<IAuthorizationHandler, UserJwtAuthorizationHandler>();
+            services.AddScoped<IAuthorizationHandler, UserAuthorizationHandler>();
 
             return services;
         }
@@ -138,6 +139,7 @@ namespace WebApi.Utils
                 var policy = new AuthorizationPolicyBuilder()
                                  .RequireAuthenticatedUser()
                                  .Build();
+
                 config.Filters.Add(new AuthorizeFilter(policy));
             });
 

@@ -17,7 +17,7 @@ namespace Persistence.EntityFramework
 {
     public class EntityUserRepository : IUserRepository
     {
-        private const string ITEM_NOT_EXISTS_EXCEPTION = "Current User does not exists";
+        private const string ITEM_NOT_EXISTS_EXCEPTION = "Current {0} does not exists";
 
         private readonly PbDbContext _db;
         private readonly IMapper _mapper;
@@ -51,7 +51,7 @@ namespace Persistence.EntityFramework
 
             if (item == null)
             {
-                throw new ItemNotExistsException(ITEM_NOT_EXISTS_EXCEPTION);
+                throw new ItemNotExistsException(string.Format(ITEM_NOT_EXISTS_EXCEPTION, nameof(User)));
             }
 
             _db.Remove(item);
@@ -146,9 +146,29 @@ namespace Persistence.EntityFramework
 
         public async Task<Unit> Update(User item)
         {
-            var entity = new UserEntity(item);
+            var existingUser = await _db.Users.Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == item.Id);
 
-            _db.Users.Update(entity);
+            if (existingUser == null)
+            {
+                throw new ItemNotExistsException(string.Format(ITEM_NOT_EXISTS_EXCEPTION, nameof(User)));
+            }
+
+            if (existingUser.Role.RoleType != item.Role.RoleType)
+            {
+                var dbRole = await _db.Roles.FirstAsync(r => r.Id == item.Role.Id);
+
+                if (dbRole == null)
+                {
+                    throw new ItemNotExistsException(string.Format(ITEM_NOT_EXISTS_EXCEPTION, nameof(UserRole)));
+                }
+
+                existingUser.Role = dbRole;
+            }
+
+            existingUser.Update(item);
+
+            _db.Users.Update(existingUser);
 
             await _db.SaveChangesAsync();
 

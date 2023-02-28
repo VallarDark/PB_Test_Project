@@ -29,9 +29,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapControllers();
-
 app.UseRouting();
+
+app.MapControllers();
 
 app.UseCors();
 
@@ -45,7 +45,5 @@ app.UseEndpoints(endpoints =>
 });
 
 app.Run();
-
-app.MapFallbackToController("Fallback", "Account");
 
 #endregion

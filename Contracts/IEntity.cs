@@ -1,6 +1,6 @@
 ﻿namespace Contracts
 {
-    public interface IEntityBase
+    public interface IEntity
     {
         public string Id { get; }
     }

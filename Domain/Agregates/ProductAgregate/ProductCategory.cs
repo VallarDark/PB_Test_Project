@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Domain.Agregates.ProductAgregate
 {
-    public class ProductCategory : IEntityBase
+    public class ProductCategory : IEntity
     {
         private const int MIN_LENGTH = 2;
         private const int MAX_LENGTH = 25;

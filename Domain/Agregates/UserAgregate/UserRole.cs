@@ -4,7 +4,7 @@ using System;
 
 namespace Domain.Agregates.UserAgregate
 {
-    public class UserRole : IEntityBase, IComparable<UserRoleType>
+    public class UserRole : IEntity, IComparable<UserRoleType>
     {
         private string id = Guid.NewGuid().ToString();
 

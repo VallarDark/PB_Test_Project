@@ -3,32 +3,32 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace PB_WebApi.Authorization
 {
-    public class UserJwtAuthorizationHandler : IAuthorizationHandler
+    internal class UserAuthorizationHandler : AuthorizationHandler<UserRoleRequirement>
     {
         private readonly IUserService _userService;
-        private readonly IUserTokenProvider _tokenProvider;
 
-        public UserJwtAuthorizationHandler(IUserService userService, IUserTokenProvider tokenProvider)
+        public UserAuthorizationHandler(IUserService userService)
         {
             _userService = userService;
-            _tokenProvider = tokenProvider;
         }
 
-        public async Task HandleAsync(AuthorizationHandlerContext context)
+        protected override async Task HandleRequirementAsync(
+            AuthorizationHandlerContext context,
+            UserRoleRequirement requirement)
         {
-            //if (context.HasFailed)
-            //{
-            //    return;
-            //}
+            if (context.HasFailed)
+            {
+                return;
+            }
 
-            //var result = context.User;
+            if (_userService.CurrentUser == null || _userService.CurrentUser.Role.CompareTo(requirement.RequiredRole) < 0)
+            {
+                context.Fail();
 
-            //var r = context.Requirements;
+                return;
+            };
 
-            //foreach (var item in context.Requirements)
-            //{
-            //    context.Succeed(item);
-            //}
+            context.Succeed(requirement);
         }
     }
 }

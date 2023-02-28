@@ -1,16 +1,15 @@
 ﻿using Domain.Agregates.UserAgregate;
+using Domain.Utils;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Services.Utils;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 
 namespace PB_WebApi.Authorization
 {
-    public class UserJwtAuthenticationHandler : AuthenticationHandler<JwtBearerOptions>
+    internal class UserJwtAuthenticationHandler : AuthenticationHandler<JwtBearerOptions>
     {
         private const string INVALID_AUTHORIZE_ERROR = "Invalid authorization data";
 
@@ -79,23 +78,48 @@ namespace PB_WebApi.Authorization
                                 continue;
                             }
 
-                            var email = principal.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Email)?.Value;
-                            var name = principal.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Name)?.Value;
-                            var lastName = principal.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.FamilyName)?.Value;
+                            var email = principal.Claims.FirstOrDefault(c =>
+                                c.Type == ClaimType.Email.ToString())?.Value;
+
+                            var name = principal.Claims.FirstOrDefault(c =>
+                                c.Type == ClaimType.Name.ToString())?.Value;
+
+                            var lastName = principal.Claims.FirstOrDefault(c =>
+                                c.Type == ClaimType.LastName.ToString())?.Value;
+
+                            var sid = principal.Claims.FirstOrDefault(c =>
+                                c.Type == ClaimType.Sid.ToString())?.Value;
+
+                            var role = principal.Claims.FirstOrDefault(c =>
+                                c.Type == ClaimType.Role.ToString())?.Value;
+
+                            var passworHash = principal.Claims.FirstOrDefault(c =>
+                                c.Type == ClaimType.PasswordHash.ToString())?.Value;
 
                             if (string.IsNullOrEmpty(email)
                                 || string.IsNullOrEmpty(name)
-                                || string.IsNullOrEmpty(lastName))
+                                || string.IsNullOrEmpty(lastName)
+                                || string.IsNullOrEmpty(sid)
+                                || string.IsNullOrEmpty(role)
+                                || string.IsNullOrEmpty(passworHash))
                             {
                                 continue;
                             }
 
-                            var personalData = new PersonalData(
-                                EncodingUtils.DecodeData(email),
-                                EncodingUtils.DecodeData(name),
-                                EncodingUtils.DecodeData(lastName));
+                            if (Enum.TryParse<UserRoleType>(EncodingUtils.DecodeData(role), true, out var roleType))
+                            {
+                                var personalData = new UserValidationDto()
+                                {
+                                    Email = EncodingUtils.DecodeData(email),
+                                    Name = EncodingUtils.DecodeData(name),
+                                    LastName = EncodingUtils.DecodeData(lastName),
+                                    SessionToken = EncodingUtils.DecodeData(sid),
+                                    Role = roleType,
+                                    PasswordHash = passworHash
+                                };
 
-                            result = await _userService.VerifyUserByPersonalData(personalData);
+                                result = await _userService.VerifyUser(personalData);
+                            }
                         }
                         catch (SecurityTokenExpiredException)
                         {
@@ -141,8 +165,8 @@ namespace PB_WebApi.Authorization
                             {
                                 tokenValidatedContext.Properties.StoreTokens(new[]
                                 {
-                            new AuthenticationToken { Name = "access_token", Value = token }
-                        });
+                                    new AuthenticationToken { Name = "access_token", Value = token }
+                                });
                             }
 
                             if (result == null)

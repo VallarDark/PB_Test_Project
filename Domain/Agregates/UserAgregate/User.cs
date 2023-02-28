@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace Domain.Agregates.UserAgregate
 {
-    public class User : IEntityBase
+    public class User : IEntity
     {
         private const string PASSWORD_PATTERN = @"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{3,}$";
         private const int MIN_LENGHT = 6;
@@ -31,6 +31,8 @@ namespace Domain.Agregates.UserAgregate
 
         public string Password { get; private set; }
 
+        public string? SessionToken { get; private set; }
+
         public UserRole Role { get; private set; }
 
         public Unit UpdateRole(UserRole role)
@@ -42,6 +44,13 @@ namespace Domain.Agregates.UserAgregate
             Role = role;
 
             return result;
+        }
+
+        public Unit GenerateNewSessionToken()
+        {
+            SessionToken = Guid.NewGuid().ToString();
+
+            return default;
         }
 
         public Unit ChangeNickName(string nickName)
@@ -60,21 +69,30 @@ namespace Domain.Agregates.UserAgregate
         {
             EnsuredUtils.EnsureNewValueIsNotSame(Password, password);
 
-            Password = EnsuredUtils.EnsurePasswordIsCorrect(
+            Password = EncodingUtils.EncodeData(EnsuredUtils.EnsurePasswordIsCorrect(
                 password,
                 PASSWORD_MIN_LENGHT,
                 PASSWORD_MAX_LENGTH,
-                _passswordPattern);
+                _passswordPattern));
 
             return default;
         }
 
         public bool VerifyPassword(string password)
         {
-            return Password.Equals(password);
+            return Password.Equals(EncodingUtils.EncodeData(password));
         }
 
-        public User(PersonalData personalData, string nickName, UserRole role, string password)
+        public bool VerifyPasswordByHash(string passwordHash)
+        {
+            return EncodingUtils.GetHashCode(Password).Equals(passwordHash);
+        }
+
+        public User(
+            PersonalData personalData,
+            string nickName,
+            UserRole role,
+            string password)
         {
             PersonalData = EnsuredUtils.EnsureNotNull(personalData);
 
@@ -85,11 +103,13 @@ namespace Domain.Agregates.UserAgregate
 
             Role = EnsuredUtils.EnsureNotNull(role);
 
-            Password = EnsuredUtils.EnsurePasswordIsCorrect(
+            Password = EncodingUtils.EncodeData(EnsuredUtils.EnsurePasswordIsCorrect(
                 password,
                 PASSWORD_MIN_LENGHT,
                 PASSWORD_MAX_LENGTH,
-                _passswordPattern);
+                _passswordPattern));
+
+            SessionToken = Guid.NewGuid().ToString();
         }
 
         public User(UserDto userDto)
@@ -110,11 +130,14 @@ namespace Domain.Agregates.UserAgregate
 
             Role = new UserRole(userDto.Role);
 
-            Password = EnsuredUtils.EnsurePasswordIsCorrect(
-                userDto.Password,
-                PASSWORD_MIN_LENGHT,
-                PASSWORD_MAX_LENGTH,
-                _passswordPattern);
+            Password = EncodingUtils.EncodeData(
+                EnsuredUtils.EnsurePasswordIsCorrect(
+                    EncodingUtils.DecodeData(userDto.Password),
+                    PASSWORD_MIN_LENGHT,
+                    PASSWORD_MAX_LENGTH,
+                    _passswordPattern));
+
+            SessionToken = userDto.SessionToken;
         }
     }
 }

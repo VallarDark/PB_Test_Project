@@ -4,7 +4,7 @@ using System;
 
 namespace Persistence.Entities
 {
-    public class UserEntity : IEntityBase
+    public class UserEntity : IEntity
     {
         public string Id { get; set; }
 
@@ -20,6 +20,8 @@ namespace Persistence.Entities
 
         public string LastName { get; set; }
 
+        public string? SessionToken { get; private set; }
+
         public UserEntity() : base()
         {
             Id = Guid.NewGuid().ToString();
@@ -29,6 +31,7 @@ namespace Persistence.Entities
             Email = string.Empty;
             Name = string.Empty;
             LastName = string.Empty;
+            SessionToken = string.Empty;
         }
 
         public UserEntity(User user)
@@ -40,6 +43,19 @@ namespace Persistence.Entities
             Email = user.PersonalData.Email;
             Name = user.PersonalData.Name;
             LastName = user.PersonalData.LastName;
+            SessionToken = user.SessionToken;
+        }
+
+        public Guid Update(User user)
+        {
+            NickName = user.NickName;
+            Password = user.Password;
+            Email = user.PersonalData.Email;
+            Name = user.PersonalData.Name;
+            LastName = user.PersonalData.LastName;
+            SessionToken = user.SessionToken;
+
+            return default;
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Contracts
 {
-    public interface IReadeableRepository<T> where T : class, IEntityBase
+    public interface IReadeableRepository<T> where T : class, IEntity
     {
         Task<T?> GetById(string id);
 

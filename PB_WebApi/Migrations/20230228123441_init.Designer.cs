@@ -10,7 +10,7 @@ using Persistence.EntityFramework.Context;
 namespace PB_WebApi.Migrations
 {
     [DbContext(typeof(PbDbContext))]
-    [Migration("20230227192717_init")]
+    [Migration("20230228123441_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,21 +24,30 @@ namespace PB_WebApi.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("NickName")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Password")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SessionToken")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -63,12 +72,12 @@ namespace PB_WebApi.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "17631a24-cfef-4fcf-ae9d-253e0b5310b2",
+                            Id = "b3ce7945-89e8-4e33-9f36-aae36e5b8e17",
                             RoleType = 0
                         },
                         new
                         {
-                            Id = "027a7ea4-a71a-46f3-8e18-13966d6dd942",
+                            Id = "202c8f1d-7f3c-4b0b-87fa-04cf971b1428",
                             RoleType = 1
                         });
                 });
@@ -77,7 +86,9 @@ namespace PB_WebApi.Migrations
                 {
                     b.HasOne("Persistence.Entities.UserRoleEntity", "Role")
                         .WithMany("Users")
-                        .HasForeignKey("RoleId");
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Role");
                 });

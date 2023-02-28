@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Persistence.Entities
 {
-    public class UserRoleEntity : IEntityBase
+    public class UserRoleEntity : IEntity
     {
         public string Id { get; set; }
 
