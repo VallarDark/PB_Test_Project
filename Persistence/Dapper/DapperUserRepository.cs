@@ -2,6 +2,7 @@
 using Domain.Agregates.UserAgregate;
 using Microsoft.FSharp.Core;
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -26,17 +27,17 @@ namespace Persistence.Dapper
             throw new NotImplementedException();
         }
 
-        public Task<PaginatedCollectionBase<User>> GetAll(int pageNumber, int itemsPerPage, Func<bool, User> predicate = null)
+        public Task<PaginatedCollectionBase<User>> GetAll(int pageNumber, int itemsPerPage, Expression<Func<User, bool>> predicate = null)
         {
             throw new NotImplementedException();
         }
 
-        public Task<PaginatedCollectionBase<User>> GetAll(Func<bool, User> predicate = null)
+        public Task<IEnumerable<User>> GetAll(Expression<Func<User, bool>> predicate = null)
         {
             throw new NotImplementedException();
         }
 
-        public Task<User> GetById(string id, Expression<Func<User, bool>> predicate = null)
+        public Task<User> GetById(string id)
         {
             throw new NotImplementedException();
         }

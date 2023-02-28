@@ -38,5 +38,7 @@ namespace Domain.Agregates.UserAgregate
             yield return Name;
             yield return LastName;
         }
+
+
     }
 }

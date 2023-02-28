@@ -1,23 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-
-namespace WebApi.Utils
+﻿namespace WebApi.Utils
 {
     public static class ControllerUtils
     {
-        public static bool IsValide(this ModelStateDictionary modelState, out IEnumerable<string>? errors)
-        {
-            if (modelState.IsValid)
-            {
-                errors = null;
+        //public static async Task<bool> HasUserRole(IUserService userService, IUserTokenProvider tokenProvider, ClaimsPrincipal user)
+        //{
+        //    var allowed = await authorizationService.AuthorizeAsync(user, "admin_access");
 
-                return true;
-            }
-
-            errors = modelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage);
-
-            return false;
-        }
+        //    if (!allowed.Succeeded)
+        //    {
+        //        Results.BadRequest("You have no permissions");
+        //    }
+        //}
     }
 }

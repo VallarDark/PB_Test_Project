@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using Domain.Agregates.UserAgregate;
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -15,17 +16,17 @@ namespace Persistence.Dapper
             throw new NotImplementedException();
         }
 
-        public Task<PaginatedCollectionBase<UserRole>> GetAll(int pageNumber, int itemsPerPage, Func<bool, UserRole> predicate = null)
+        public Task<PaginatedCollectionBase<UserRole>> GetAll(int pageNumber, int itemsPerPage, Expression<Func<UserRole, bool>> predicate = null)
         {
             throw new NotImplementedException();
         }
 
-        public Task<PaginatedCollectionBase<UserRole>> GetAll(Func<bool, UserRole> predicate = null)
+        public Task<IEnumerable<UserRole>> GetAll(Expression<Func<UserRole, bool>> predicate = null)
         {
             throw new NotImplementedException();
         }
 
-        public Task<UserRole> GetById(string id, Expression<Func<UserRole, bool>> predicate = null)
+        public Task<UserRole> GetById(string id)
         {
             throw new NotImplementedException();
         }

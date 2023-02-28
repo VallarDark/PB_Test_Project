@@ -1,33 +1,50 @@
 ﻿using Contracts;
 using Domain.Utils;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Domain.Agregates.UserAgregate
 {
-    public class UserRole : ValueObject, IComparable<UserRoleType>
+    public class UserRole : IEntityBase, IComparable<UserRoleType>
     {
-        private ICollection<User> users;
+        private string id = Guid.NewGuid().ToString();
+
+        public string Id => id;
 
         public UserRoleType RoleType { get; private set; }
 
-        public ICollection<User> Users => users.ToList();
-
-        public UserRole(UserRoleType role, ICollection<User> users)
+        public UserRole(UserRoleType role)
         {
             RoleType = role;
-            this.users = EnsuredUtils.EnsureNotNull(users);
         }
 
-        protected override IEnumerable<object> GetEqualityComponents()
+        public UserRole(UserRoleDto roleDto)
         {
-            yield return RoleType;
+            id = EnsuredUtils.EnsureStringIsNotEmpty(roleDto.Id);
+
+            RoleType = roleDto.RoleType;
         }
 
         public int CompareTo(UserRoleType other)
         {
             return ((int)RoleType).CompareTo((int)other);
+        }
+
+        public override bool Equals(object other)
+        {
+            if (other is UserRole otherRole)
+            {
+                if (otherRole.RoleType == RoleType)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, RoleType);
         }
     }
 }

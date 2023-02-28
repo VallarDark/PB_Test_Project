@@ -70,7 +70,12 @@ namespace Services.UserAgregate
                 userRepository,
                 string.Format(REPOSITORY_DOES_NOT_EXISTS, nameof(userRepository)));
 
-            return await userRepository.Get(u => u.PersonalData == personalData);
+            currentUser = await userRepository.Get(u =>
+            u.PersonalData.Email == personalData.Email
+            && u.PersonalData.Name == personalData.Name
+            && u.PersonalData.LastName == personalData.LastName);
+
+            return currentUser;
         }
 
         public async Task<PaginatedCollectionBase<User>> GetAllUsers(int pageNumber)
@@ -106,7 +111,7 @@ namespace Services.UserAgregate
                 item.Name,
                 item.LastName);
 
-            var existedUser = VerifyUserByPersonalData(personalData);
+            var existedUser = await VerifyUserByPersonalData(personalData);
 
             if (existedUser != null)
             {

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Contracts
 {
-    public abstract class ValueObject : EntityBase
+    public abstract class ValueObject
     {
         protected static bool EqualOperator(ValueObject left, ValueObject right)
         {

@@ -4,14 +4,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 #region ServicesInjection
 
-builder.Services.AddAuthorization();
-builder.Services.AddControllers();
+builder.Services.AddConfiguredAuthentication(builder.Configuration);
+builder.Services.AddConfiguredAuthorization();
+builder.Services.AddConfiguredControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddRepositoryResolver();
 builder.Services.AddRepositories();
 builder.Services.AddServices();
-builder.Services.AddJwt(builder.Configuration);
 
 #endregion
 
@@ -25,13 +25,27 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseExceptionHandler();
 
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseHttpsRedirection();
 
 app.MapControllers();
 
+app.UseRouting();
+
+app.UseCors();
+
+app.UseAuthentication();
+
+app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
+
 app.Run();
+
+app.MapFallbackToController("Fallback", "Account");
 
 #endregion

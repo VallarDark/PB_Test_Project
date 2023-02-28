@@ -1,10 +1,12 @@
 ﻿using Domain.Agregates.UserAgregate;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using PB_WebApi.Models;
 
 namespace PB_WebApi.Controllers
 {
+    [EnableCors("CrudPolicy")]
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
@@ -40,11 +42,6 @@ namespace PB_WebApi.Controllers
         [AllowAnonymous]
         public async Task<IResult> Login(UserLoginModel loginModel)
         {
-            //if (!ModelState.IsValide(out var errors))
-            //{
-            //    return Results.BadRequest(errors);
-            //}
-
             var userDto = new UserDto()
             {
                 Email = loginModel.Email,
@@ -55,5 +52,21 @@ namespace PB_WebApi.Controllers
 
             return Results.Ok(result);
         }
+
+        [HttpGet("Unauthorized")]
+        [AllowAnonymous]
+        public IResult Unauthorized()
+        {
+            return Results.Content("You should authorize");
+        }
+
+        [HttpGet("Fallback")]
+        [AllowAnonymous]
+        public IResult Fallback()
+        {
+            return Results.Content("Something gone wrong)");
+        }
+
+
     }
 }

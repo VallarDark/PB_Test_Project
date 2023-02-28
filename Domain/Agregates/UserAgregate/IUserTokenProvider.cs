@@ -1,9 +1,12 @@
-﻿namespace Domain.Agregates.UserAgregate
+﻿using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+
+namespace Domain.Agregates.UserAgregate
 {
     public interface IUserTokenProvider
     {
         string GenerateToken(User user);
 
-        PersonalData ReadToken(string token);
+        ClaimsPrincipal? ReadToken(string token, TokenValidationParameters parameters, out SecurityToken? securityToken);
     }
 }

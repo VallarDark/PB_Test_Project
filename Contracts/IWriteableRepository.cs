@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Contracts
 {
-    public interface IWriteableRepository<T> where T : EntityBase
+    public interface IWriteableRepository<T> where T : class, IEntityBase
     {
         Task<Unit> Create(T item);
 
