@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Domain.Agregates.ProductAgregate
 {
-    public class ProductCategoryEntity : IEntity
+    public class ProductCategoryEntity : ValueObject, IEntity
     {
         public string Id { get; set; }
 
@@ -28,6 +28,20 @@ namespace Domain.Agregates.ProductAgregate
             Description = category.Description;
 
             return default;
+        }
+
+        public Guid Update(ProductCategoryEntity category)
+        {
+            Name = category.Name;
+            Description = category.Description;
+
+            return default;
+        }
+
+        protected override IEnumerable<object> GetEqualityComponents()
+        {
+            yield return Name;
+            yield return Description;
         }
     }
 }

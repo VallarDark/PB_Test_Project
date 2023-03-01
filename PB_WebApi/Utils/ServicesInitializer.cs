@@ -1,5 +1,6 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Contracts;
+using Domain.Agregates.ProductAgregate;
 using Domain.Agregates.UserAgregate;
 using Domain.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -9,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using PB_WebApi.Authorization;
 using Persistence.EntityFramework.Context;
 using Services;
+using Services.ProductAgregate;
 using Services.UserAgregate;
 using Services.Utils;
 using System.Reflection;
@@ -40,6 +42,7 @@ namespace WebApi.Utils
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IUserTokenProvider, UserTokenProvider>();
 
             return services;
@@ -62,6 +65,8 @@ namespace WebApi.Utils
 
             services.AddTransient<IUserRepository>(allAsssemblyTypes);
             services.AddTransient<IUserRoleRepository>(allAsssemblyTypes);
+            services.AddTransient<IProductRepository>(allAsssemblyTypes);
+            services.AddTransient<IProductCategoryRepository>(allAsssemblyTypes);
 
             return services;
         }

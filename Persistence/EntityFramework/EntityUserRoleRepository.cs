@@ -82,13 +82,13 @@ namespace Persistence.EntityFramework
 
             if (predicate == null)
             {
-                result = _Db.Roles;
+                result = _Db.Roles.Take(ITEMS_LIMIT); ;
             }
             else
             {
                 var mappedPredicate = _Mapper.Map<Expression<Func<UserRoleEntity, bool>>>(predicate);
 
-                result = _Db.Roles.Where(mappedPredicate);
+                result = _Db.Roles.Where(mappedPredicate).Take(ITEMS_LIMIT);
             }
             return await result.Select(u => new UserRole(_Mapper.Map<UserRoleDto>(u)))
                 .ToListAsync();

@@ -7,38 +7,33 @@ using System.Threading.Tasks;
 
 namespace Services.UserAgregate
 {
-    public class UserService : IUserService
+    public class UserService : ResolvableServiceBase, IUserService
     {
         private const int ITEMS_PER_PAGE = 15;
         private const string REPOSITORY_DOES_NOT_EXISTS = "{0} repository doesn't exists";
-        const string DEFAULT_USER_SHOULD_EXISTS_ERROR = "Current {0} does not exist";
-        const string DEFAULT_INVALID_LOGIN_DATA_ERROR = "Invalid login data";
-        const string DEFAULT_USER_SHOULD_NOT_EXISTS_ERROR = "{0} with same data already exists";
+        private const string DEFAULT_USER_SHOULD_EXISTS_ERROR = "Current {0} does not exist";
+        private const string DEFAULT_INVALID_LOGIN_DATA_ERROR = "Invalid login data";
+        private const string DEFAULT_USER_SHOULD_NOT_EXISTS_ERROR = "{0} with same data already exists";
 
-        private readonly IRepositoryResolver _repositoryResolver;
         private readonly IUserTokenProvider _userTokenProvider;
 
         private User? currentUser;
 
         private IUserRepository? userRepository =>
-            _repositoryResolver?.GetRepository<IUserRepository, User>(RepositoryType)
+            _RepositoryResolver?.GetRepository<IUserRepository, User>(RepositoryType)
             as IUserRepository;
 
         private IUserRoleRepository? userRoleRepository =>
-            _repositoryResolver?.GetReadeableRepository<IUserRoleRepository, UserRole>(RepositoryType)
+            _RepositoryResolver?.GetReadeableRepository<IUserRoleRepository, UserRole>(RepositoryType)
             as IUserRoleRepository;
-
-        public RepositoryType RepositoryType { get; set; }
 
         public User? CurrentUser => currentUser;
 
         public UserService(
             IRepositoryResolver repositoryResolver,
-            IUserTokenProvider userTokenProvider)
+            IUserTokenProvider userTokenProvider) : base(repositoryResolver)
         {
-            _repositoryResolver = repositoryResolver;
             _userTokenProvider = userTokenProvider;
-            RepositoryType = RepositoryType.EntityFramework;
         }
 
         public async Task<string> RegisterCasualUser(UserRegistrationDto userData)

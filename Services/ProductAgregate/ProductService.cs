@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace Services.ProductAgregate
 {
-    internal class ProductService : IProductService
+    public class ProductService : ResolvableServiceBase, IProductService
     {
-        public RepositoryType RepositoryType { get; set; }
+        public ProductService(
+            IRepositoryResolver repositoryResolver) : base(repositoryResolver)
+        {
+        }
 
         public Task<Unit> AddProductToCategory(string productId, string categoryId)
         {

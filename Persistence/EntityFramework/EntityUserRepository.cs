@@ -17,8 +17,6 @@ namespace Persistence.EntityFramework
 {
     public class EntityUserRepository : EntityRepositoryBase, IUserRepository
     {
-        private const string ITEM_NOT_EXISTS_EXCEPTION = "Current {0} does not exists";
-
         public EntityUserRepository(PbDbContext db, IMapper mapper) : base(db, mapper)
         {
         }
@@ -113,13 +111,13 @@ namespace Persistence.EntityFramework
 
             if (predicate == null)
             {
-                result = _Db.Users.Include(u => u.Role);
+                result = _Db.Users.Include(u => u.Role).Take(ITEMS_LIMIT);
             }
             else
             {
                 var mappedPredicate = _Mapper.Map<Expression<Func<UserEntity, bool>>>(predicate);
 
-                result = _Db.Users.Include(u => u.Role).Where(mappedPredicate);
+                result = _Db.Users.Include(u => u.Role).Where(mappedPredicate).Take(ITEMS_LIMIT);
             }
 
             return await result.Select(u => new User(_Mapper.Map<UserDto>(u))).ToListAsync();
@@ -139,15 +137,15 @@ namespace Persistence.EntityFramework
 
         public async Task<Unit> Update(User item)
         {
-            var existingUser = await _Db.Users.Include(u => u.Role)
+            var existingItem = await _Db.Users.Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Id == item.Id);
 
-            if (existingUser == null)
+            if (existingItem == null)
             {
                 throw new ItemNotExistsException(string.Format(ITEM_NOT_EXISTS_EXCEPTION, nameof(User)));
             }
 
-            if (existingUser.Role.RoleType != item.Role.RoleType)
+            if (existingItem.Role.RoleType != item.Role.RoleType)
             {
                 var dbRole = await _Db.Roles.FirstAsync(r => r.Id == item.Role.Id);
 
@@ -156,12 +154,12 @@ namespace Persistence.EntityFramework
                     throw new ItemNotExistsException(string.Format(ITEM_NOT_EXISTS_EXCEPTION, nameof(UserRole)));
                 }
 
-                existingUser.Role = dbRole;
+                existingItem.Role = dbRole;
             }
 
-            existingUser.Update(item);
+            existingItem.Update(item);
 
-            _Db.Users.Update(existingUser);
+            _Db.Users.Update(existingItem);
 
             await _Db.SaveChangesAsync();
 

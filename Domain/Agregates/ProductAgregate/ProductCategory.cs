@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Domain.Agregates.ProductAgregate
 {
-    public class ProductCategory : IEntity
+    public class ProductCategory : ValueObject, IEntity
     {
         private const int MIN_LENGTH = 2;
         private const int MAX_LENGTH = 25;
@@ -78,6 +78,12 @@ namespace Domain.Agregates.ProductAgregate
             products.Remove(product);
 
             return default;
+        }
+
+        protected override IEnumerable<object> GetEqualityComponents()
+        {
+            yield return Name;
+            yield return Description;
         }
     }
 }
