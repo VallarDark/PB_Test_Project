@@ -25,35 +25,55 @@ namespace Domain.Agregates.ProductAgregate
 
         public ICollection<Product> Products => products.ToList();
 
-        public ProductCategory(string name, string description, ICollection<Product> products)
+        public ProductCategory(string name, string description)
         {
-            Name = EnsuredUtils.EnsureStringLengthIsCorrect(name, MIN_LENGTH, MAX_LENGTH);
-            this.products = EnsuredUtils.EnsureNotNull(products);
-            Description = EnsuredUtils.EnsureStringLengthIsCorrect(description, MIN_LENGTH, MAX_DESCRIPTION_LENGTH);
+            Name = EnsuredUtils.EnsureStringLengthIsCorrect(
+                name,
+                MIN_LENGTH,
+                MAX_LENGTH);
+
+            Description = EnsuredUtils.EnsureStringLengthIsCorrect(
+                description,
+                MIN_LENGTH,
+                MAX_DESCRIPTION_LENGTH);
+
+            products = new List<Product>();
         }
 
         public ProductCategory(ProductCategoryDto categoryDto)
         {
             id = EnsuredUtils.EnsureStringIsNotEmpty(categoryDto.Id);
-            Name = EnsuredUtils.EnsureStringLengthIsCorrect(categoryDto.Name, MIN_LENGTH, MAX_LENGTH);
-            products = EnsuredUtils.EnsureNotNull(categoryDto.Products.Select(p => new Product(p)).ToList());
-            Description = EnsuredUtils.EnsureStringLengthIsCorrect(categoryDto.Description, MIN_LENGTH, MAX_DESCRIPTION_LENGTH);
+
+            Name = EnsuredUtils.EnsureStringLengthIsCorrect(
+                categoryDto.Name,
+                MIN_LENGTH,
+                MAX_LENGTH);
+
+            products = EnsuredUtils.EnsureNotNull(
+                categoryDto.Products.Select(p => new Product(p)).ToList());
+
+            Description = EnsuredUtils.EnsureStringLengthIsCorrect(
+                categoryDto.Description,
+                MIN_LENGTH,
+                MAX_DESCRIPTION_LENGTH);
         }
 
         public Unit ChangeName(string name)
         {
-            EnsuredUtils.EnsureNewValueIsNotSame(Name, name);
-
-            Name = EnsuredUtils.EnsureStringLengthIsCorrect(name, MIN_LENGTH, MAX_LENGTH);
+            Name = EnsuredUtils.EnsureStringLengthIsCorrect(
+                name,
+                MIN_LENGTH,
+                MAX_LENGTH);
 
             return default;
         }
 
         public Unit ChangeDescription(string description)
         {
-            EnsuredUtils.EnsureNewValueIsNotSame(Description, description);
-
-            Description = EnsuredUtils.EnsureStringLengthIsCorrect(description, MIN_LENGTH, MAX_DESCRIPTION_LENGTH);
+            Description = EnsuredUtils.EnsureStringLengthIsCorrect(
+                description,
+                MIN_LENGTH,
+                MAX_DESCRIPTION_LENGTH);
 
             return default;
         }

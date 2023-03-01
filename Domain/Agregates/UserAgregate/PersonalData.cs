@@ -27,9 +27,19 @@ namespace Domain.Agregates.UserAgregate
 
         public PersonalData(string email, string name, string lastName)
         {
-            Email = EnsuredUtils.EnsureStringIsNotEmptyAndMathPattern(email, _emailPattern);
-            Name = EnsuredUtils.EnsureStringLengthIsCorrect(name, MIN_LENGHT, MAX_LENGTH);
-            LastName = EnsuredUtils.EnsureStringLengthIsCorrect(lastName, MIN_LENGHT, MAX_LENGTH);
+            Email = EnsuredUtils.EnsureStringIsNotEmptyAndMathPattern(
+                email,
+                _emailPattern);
+
+            Name = EnsuredUtils.EnsureStringLengthIsCorrect(
+                name,
+                MIN_LENGHT,
+                MAX_LENGTH);
+
+            LastName = EnsuredUtils.EnsureStringLengthIsCorrect(
+                lastName,
+                MIN_LENGHT,
+                MAX_LENGTH);
         }
 
         protected override IEnumerable<object> GetEqualityComponents()

@@ -8,6 +8,8 @@ namespace Domain.Agregates.UserAgregate
     {
         User? CurrentUser { get; }
 
+        bool DoesUserHavePermission(UserRoleType permission);
+
         RepositoryType RepositoryType { get; set; }
 
         Task<string> RegisterCasualUser(UserRegistrationDto userData);

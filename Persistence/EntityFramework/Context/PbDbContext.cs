@@ -54,9 +54,9 @@ namespace Persistence.EntityFramework.Context
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite($@"Data Source={_configuration["Db:DataSource"]}", b => b.MigrationsAssembly("PB_WebApi"));
+            optionsBuilder.UseSqlite(
+                $@"Data Source={_configuration["Db:DataSource"]}",
+                b => b.MigrationsAssembly("PB_WebApi"));
         }
-
-
     }
 }

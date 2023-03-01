@@ -15,7 +15,8 @@ namespace Services
             _serviceProvider = EnsuredUtils.EnsureNotNull(serviceProvider);
         }
 
-        public IReadeableRepository<Y>? GetReadeableRepository<T, Y>(RepositoryType repositoryType)
+        public IReadeableRepository<Y>? GetReadeableRepository<T, Y>(
+            RepositoryType repositoryType)
             where T : class, IReadeableRepository<Y>, IResolvable
             where Y : class, IEntity
         {
@@ -23,7 +24,8 @@ namespace Services
                 .GetReadeableRepositoryOrDefault<T, Y>(repositoryType);
         }
 
-        public IRemoveableRepository<Y>? GetRemoveableRepository<T, Y>(RepositoryType repositoryType)
+        public IRemoveableRepository<Y>? GetRemoveableRepository<T, Y>(
+            RepositoryType repositoryType)
             where T : class, IRemoveableRepository<Y>, IResolvable
             where Y : class, IEntity
         {
@@ -31,7 +33,8 @@ namespace Services
                 .GetRemoveableRepositoryOrDefault<T, Y>(repositoryType);
         }
 
-        public IRepository<Y>? GetRepository<T, Y>(RepositoryType repositoryType)
+        public IRepository<Y>? GetRepository<T, Y>(
+            RepositoryType repositoryType)
             where T : class, IRepository<Y>, IResolvable
             where Y : class, IEntity
         {
@@ -39,7 +42,8 @@ namespace Services
                 .GetRepositoryOrDefault<T, Y>(repositoryType);
         }
 
-        public IWriteableRepository<Y>? GetWriteableRepository<T, Y>(RepositoryType repositoryType)
+        public IWriteableRepository<Y>? GetWriteableRepository<T, Y>(
+            RepositoryType repositoryType)
             where T : class, IWriteableRepository<Y>, IResolvable
             where Y : class, IEntity
         {

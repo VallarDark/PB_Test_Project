@@ -9,11 +9,7 @@ namespace Services.UserAgregate
 {
     public class UserService : ResolvableServiceBase, IUserService
     {
-        private const int ITEMS_PER_PAGE = 15;
-        private const string REPOSITORY_DOES_NOT_EXISTS = "{0} repository doesn't exists";
-        private const string DEFAULT_USER_SHOULD_EXISTS_ERROR = "Current {0} does not exist";
         private const string DEFAULT_INVALID_LOGIN_DATA_ERROR = "Invalid login data";
-        private const string DEFAULT_USER_SHOULD_NOT_EXISTS_ERROR = "{0} with same data already exists";
 
         private readonly IUserTokenProvider _userTokenProvider;
 
@@ -28,6 +24,13 @@ namespace Services.UserAgregate
             as IUserRoleRepository;
 
         public User? CurrentUser => currentUser;
+
+        public bool DoesUserHavePermission(UserRoleType permission)
+        {
+            EnsuredUtils.EnsureNotNull(currentUser, DEFAULT_UNAUTHORISED_ERROR);
+
+            return currentUser.Role.CompareTo(permission) >= 0;
+        }
 
         public UserService(
             IRepositoryResolver repositoryResolver,
@@ -52,10 +55,12 @@ namespace Services.UserAgregate
                 userRepository,
                 string.Format(REPOSITORY_DOES_NOT_EXISTS, nameof(userRepository)));
 
-            var existedUser = await userRepository.Get(u =>
-                u.PersonalData.Email == userData.Email);
+            var existedUser = await userRepository.Get(
+                    u => u.PersonalData.Email == userData.Email,
+                    addInnerItems: true);
 
-            if (existedUser == null || !existedUser.VerifyPassword(userData.Password))
+            if (existedUser == null
+                || !existedUser.VerifyPassword(userData.Password))
             {
                 throw new InvalidLoginDataException(DEFAULT_INVALID_LOGIN_DATA_ERROR);
             }
@@ -80,8 +85,8 @@ namespace Services.UserAgregate
                 && u.PersonalData.Name == userValidationData.Name
                 && u.PersonalData.LastName == userValidationData.LastName
                 && u.SessionToken == userValidationData.SessionToken
-                && u.Role.RoleType == userValidationData.Role
-            );
+                && u.Role.RoleType == userValidationData.Role,
+                addInnerItems: true);
 
             if (currentUser == null
                 || !currentUser.VerifyPasswordByHash(userValidationData.PasswordHash))
@@ -94,15 +99,19 @@ namespace Services.UserAgregate
 
         public async Task<PaginatedCollectionBase<User>> GetAllUsers(int pageNumber)
         {
-            EnsuredUtils.EnsureNotNull(currentUser);
-
-            PermissionCheckUtils.DoesUserHavePermission(currentUser, UserRoleType.Admin);
+            if (!DoesUserHavePermission(UserRoleType.Admin))
+            {
+                throw new LowPrevilegiesLevelException(DEFAULT_LOW_PREVILEGIES_LEVEL_ERROR);
+            }
 
             EnsuredUtils.EnsureNotNull(
                 userRepository,
                 string.Format(REPOSITORY_DOES_NOT_EXISTS, nameof(userRepository)));
 
-            return await userRepository.GetAll(pageNumber, ITEMS_PER_PAGE);
+            return await userRepository.GetPage(
+                pageNumber,
+                ITEMS_PER_PAGE,
+                addInnerItems: true);
         }
 
         private async Task<string> RegisterUser(
@@ -120,13 +129,12 @@ namespace Services.UserAgregate
             var existedUser = await userRepository.Get(u =>
                 u.PersonalData.Email == userData.Email
                 && u.PersonalData.Name == userData.Name
-                && u.PersonalData.LastName == userData.LastName
-            );
+                && u.PersonalData.LastName == userData.LastName);
 
             if (existedUser != null)
             {
                 throw new ItemAlreadyExistsException(
-                    string.Format(DEFAULT_USER_SHOULD_NOT_EXISTS_ERROR, nameof(User)));
+                    string.Format(DEFAULT_ITEM_SHOULD_NOT_EXISTS_ERROR, nameof(User)));
             }
 
             var role = await userRoleRepository.Get(r => r.RoleType == roleType);
@@ -134,7 +142,7 @@ namespace Services.UserAgregate
             if (role == null)
             {
                 throw new ItemNotExistsException(
-                    string.Format(DEFAULT_USER_SHOULD_EXISTS_ERROR, nameof(UserRole)));
+                    string.Format(DEFAULT_ITEM_SHOULD_EXISTS_ERROR, nameof(UserRole)));
             }
 
             var personalData = new PersonalData(
@@ -170,7 +178,7 @@ namespace Services.UserAgregate
             if (existedUser == null)
             {
                 throw new ItemNotExistsException(
-                    string.Format(DEFAULT_USER_SHOULD_EXISTS_ERROR, nameof(User)));
+                    string.Format(DEFAULT_ITEM_SHOULD_EXISTS_ERROR, nameof(User)));
             }
 
             var role = await userRoleRepository.Get(r => r.RoleType == roleType);
@@ -178,7 +186,7 @@ namespace Services.UserAgregate
             if (role == null)
             {
                 throw new ItemNotExistsException(
-                    string.Format(DEFAULT_USER_SHOULD_EXISTS_ERROR, nameof(UserRole)));
+                    string.Format(DEFAULT_ITEM_SHOULD_EXISTS_ERROR, nameof(UserRole)));
             }
 
             existedUser.UpdateRole(role);

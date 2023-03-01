@@ -8,7 +8,9 @@ namespace Domain.Agregates.UserAgregate
 {
     public class User : IEntity
     {
-        private const string PASSWORD_PATTERN = @"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{3,}$";
+        private const string PASSWORD_PATTERN =
+            @"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{3,}$";
+
         private const int MIN_LENGHT = 6;
         private const int MAX_LENGTH = 20;
         private const int PASSWORD_MIN_LENGHT = 8;

@@ -19,19 +19,29 @@ namespace Persistence.EntityFramework
         {
         }
 
-        public async Task<UserRole?> Get(Expression<Func<UserRole, bool>>? predicate = null)
+        public async Task<UserRole?> Get(
+            Expression<Func<UserRole, bool>>? predicate = null,
+            bool addInnerItems = false)
         {
             UserRoleEntity? result;
 
+            IQueryable<UserRoleEntity> items = _Db.Roles;
+
+            if (addInnerItems)
+            {
+                items.Include(r => r.Users);
+            }
+
             if (predicate == null)
             {
-                result = await _Db.Roles.FirstOrDefaultAsync();
+                result = await items.FirstOrDefaultAsync();
             }
             else
             {
-                var mappedPredicate = _Mapper.Map<Expression<Func<UserRoleEntity, bool>>>(predicate);
+                var mappedPredicate =
+                    _Mapper.Map<Expression<Func<UserRoleEntity, bool>>>(predicate);
 
-                result = await _Db.Roles.FirstOrDefaultAsync(mappedPredicate);
+                result = await items.FirstOrDefaultAsync(mappedPredicate);
             }
 
             if (result == null)
@@ -42,61 +52,84 @@ namespace Persistence.EntityFramework
             return new UserRole(_Mapper.Map<UserRoleDto>(result));
         }
 
-        public async Task<PaginatedCollectionBase<UserRole>> GetAll(
+        public async Task<PaginatedCollectionBase<UserRole>> GetPage(
             int pageNumber,
             int itemsPerPage,
-            Expression<Func<UserRole, bool>>? predicate = null)
+            Expression<Func<UserRole, bool>>? predicate = null,
+            bool addInnerItems = false)
         {
             EnsuredUtils.EnsureNumberIsMoreOrEqualValue(pageNumber, 1);
             EnsuredUtils.EnsureNumberIsMoreOrEqualValue(itemsPerPage, 1);
 
-            IQueryable<UserRoleEntity> result;
+            IQueryable<UserRoleEntity> result = _Db.Roles;
+
+            if (addInnerItems)
+            {
+                result = result.Include(r => r.Users);
+            }
+
+            if (predicate != null)
+            {
+                var mappedPredicate =
+                    _Mapper.Map<Expression<Func<UserRoleEntity, bool>>>(predicate);
+
+                result = result
+                    .Where(mappedPredicate);
+            }
 
             var skipItems = (pageNumber - 1) * itemsPerPage;
 
-            if (predicate == null)
-            {
-                result = _Db.Roles
-                    .Skip(skipItems)
-                    .Take(itemsPerPage);
-            }
-            else
-            {
-                var mappedPredicate = _Mapper.Map<Expression<Func<UserRoleEntity, bool>>>(predicate);
+            result = result.Skip(skipItems).Take(itemsPerPage);
 
-                result = _Db.Roles
-                        .Where(mappedPredicate)
-                        .Skip(skipItems)
-                        .Take(itemsPerPage);
-            }
-
-            var collection = await result.Select(u => new UserRole(_Mapper.Map<UserRoleDto>(u)))
+            var collection = await result
+                .Select(u => new UserRole(_Mapper.Map<UserRoleDto>(u)))
                 .ToListAsync();
 
-            return new PaginatedCollection<UserRole>(collection, collection.Count == itemsPerPage);
+            return new PaginatedCollection<UserRole>(
+                collection,
+                collection.Count == itemsPerPage);
         }
 
-        public async Task<IEnumerable<UserRole>> GetAll(Expression<Func<UserRole, bool>>? predicate = null)
+        public async Task<IEnumerable<UserRole>> GetAll(
+            Expression<Func<UserRole, bool>>? predicate = null,
+            bool addInnerItems = false)
         {
-            IQueryable<UserRoleEntity> result;
+            IQueryable<UserRoleEntity> result = _Db.Roles;
 
-            if (predicate == null)
+            if (addInnerItems)
             {
-                result = _Db.Roles.Take(ITEMS_LIMIT); ;
+                result = result.Include(r => r.Users);
             }
-            else
-            {
-                var mappedPredicate = _Mapper.Map<Expression<Func<UserRoleEntity, bool>>>(predicate);
 
-                result = _Db.Roles.Where(mappedPredicate).Take(ITEMS_LIMIT);
+            if (predicate != null)
+            {
+                var mappedPredicate =
+                    _Mapper.Map<Expression<Func<UserRoleEntity, bool>>>(predicate);
+
+                result = result.Where(mappedPredicate);
             }
-            return await result.Select(u => new UserRole(_Mapper.Map<UserRoleDto>(u)))
+
+            result = result.Take(ITEMS_LIMIT);
+
+            return await result
+                .Select(u => new UserRole(_Mapper.Map<UserRoleDto>(u)))
                 .ToListAsync();
         }
 
-        public async Task<UserRole?> GetById(string id)
+        public async Task<UserRole?> GetById(
+            string id,
+            bool addInnerItems = false)
         {
-            var result = await _Db.Roles.FirstOrDefaultAsync(ur => ur.Id == id);
+            UserRoleEntity? result;
+
+            IQueryable<UserRoleEntity> items = _Db.Roles;
+
+            if (addInnerItems)
+            {
+                items.Include(r => r.Users);
+            }
+
+            result = await items.FirstOrDefaultAsync(ur => ur.Id == id);
 
             if (result == null)
             {

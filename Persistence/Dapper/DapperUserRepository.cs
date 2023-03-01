@@ -22,22 +22,22 @@ namespace Persistence.Dapper
             throw new NotImplementedException();
         }
 
-        public Task<User> Get(Expression<Func<User, bool>> predicate = null)
+        public Task<User?> Get(Expression<Func<User, bool>>? predicate = null, bool addInnerItems = false)
         {
             throw new NotImplementedException();
         }
 
-        public Task<PaginatedCollectionBase<User>> GetAll(int pageNumber, int itemsPerPage, Expression<Func<User, bool>> predicate = null)
+        public Task<IEnumerable<User>> GetAll(Expression<Func<User, bool>>? predicate = null, bool addInnerItems = false)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<User>> GetAll(Expression<Func<User, bool>> predicate = null)
+        public Task<User?> GetById(string id, bool addInnerItems = false)
         {
             throw new NotImplementedException();
         }
 
-        public Task<User> GetById(string id)
+        public Task<PaginatedCollectionBase<User>> GetPage(int pageNumber, int itemsPerPage, Expression<Func<User, bool>>? predicate = null, bool addInnerItems = false)
         {
             throw new NotImplementedException();
         }

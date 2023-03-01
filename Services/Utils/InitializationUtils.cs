@@ -12,13 +12,19 @@ namespace Services.Utils
             return types.Where(t => t.GetInterfaces().Contains(typeof(T)));
         }
 
-        public static IServiceCollection AddTransient<T>(this IServiceCollection services, IEnumerable<Type> assemblyTypes)
+        public static IServiceCollection AddTransient<T>(
+            this IServiceCollection services,
+            IEnumerable<Type> assemblyTypes)
         {
             var instances = assemblyTypes.GetAllInstances<T>();
 
             foreach (var instance in instances)
             {
-                services.Add(new ServiceDescriptor(typeof(T), instance, ServiceLifetime.Transient));
+                services.Add(
+                    new ServiceDescriptor(
+                        typeof(T),
+                        instance,
+                        ServiceLifetime.Transient));
             }
 
             return services;

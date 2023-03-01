@@ -7,6 +7,9 @@ namespace Domain.Agregates.UserAgregate
     {
         string GenerateToken(User user);
 
-        ClaimsPrincipal? ReadToken(string token, TokenValidationParameters parameters, out SecurityToken? securityToken);
+        ClaimsPrincipal? ReadToken(
+            string token,
+            TokenValidationParameters parameters,
+            out SecurityToken? securityToken);
     }
 }

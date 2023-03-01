@@ -27,7 +27,8 @@ namespace WebApi.Utils
         /// </summary>
         /// <param name="services">Service collection</param>
         /// <returns>Service collection</returns>
-        public static IServiceCollection AddRepositoryResolver(this IServiceCollection services)
+        public static IServiceCollection AddRepositoryResolver(
+            this IServiceCollection services)
         {
             services.AddScoped<IRepositoryResolver, RepositoryResolver>();
 
@@ -39,7 +40,8 @@ namespace WebApi.Utils
         /// </summary>
         /// <param name="services">Service collection</param>
         /// <returns>Service collection</returns>
-        public static IServiceCollection AddServices(this IServiceCollection services)
+        public static IServiceCollection AddServices(
+            this IServiceCollection services)
         {
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IProductService, ProductService>();
@@ -53,7 +55,8 @@ namespace WebApi.Utils
         /// </summary>
         /// <param name="services">Service collection</param>
         /// <returns>Service collection</returns>
-        public static IServiceCollection AddRepositories(this IServiceCollection services)
+        public static IServiceCollection AddRepositories(
+            this IServiceCollection services)
         {
             var assembly = Assembly.Load(nameof(Persistence));
 
@@ -77,7 +80,9 @@ namespace WebApi.Utils
         /// <param name="services">Service collection</param>
         /// <param name="configuration">Project configuration</param>
         /// <returns>Service collection</returns>
-        public static IServiceCollection AddConfiguredAuthentication(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddConfiguredAuthentication(
+            this IServiceCollection services,
+            IConfiguration configuration)
         {
             var scheme = JwtBearerDefaults.AuthenticationScheme;
 
@@ -115,7 +120,8 @@ namespace WebApi.Utils
         /// </summary>
         /// <param name="services">Service collection</param>
         /// <returns>Service collection</returns>
-        public static IServiceCollection AddConfiguredAuthorization(this IServiceCollection services)
+        public static IServiceCollection AddConfiguredAuthorization(
+            this IServiceCollection services)
         {
             services.AddAuthorization(options =>
             {
@@ -123,8 +129,13 @@ namespace WebApi.Utils
                     .RequireAuthenticatedUser()
                     .Build();
 
-                options.AddPolicy("AdminRole", p => p.AddRequirements(new UserRoleRequirement(UserRoleType.Admin)));
-                options.AddPolicy("UserRole", p => p.AddRequirements(new UserRoleRequirement(UserRoleType.User)));
+                options.AddPolicy(
+                    "AdminRole",
+                    p => p.AddRequirements(new UserRoleRequirement(UserRoleType.Admin)));
+
+                options.AddPolicy(
+                    "UserRole",
+                    p => p.AddRequirements(new UserRoleRequirement(UserRoleType.User)));
             });
 
             services.AddScoped<IAuthorizationHandler, UserAuthorizationHandler>();
@@ -137,7 +148,8 @@ namespace WebApi.Utils
         /// </summary>
         /// <param name="services">Service collection</param>
         /// <returns>Service collection</returns>
-        public static IServiceCollection AddConfiguredControllers(this IServiceCollection services)
+        public static IServiceCollection AddConfiguredControllers(
+            this IServiceCollection services)
         {
             services.AddControllers(config =>
             {
@@ -156,7 +168,8 @@ namespace WebApi.Utils
         /// </summary>
         /// <param name="services">Service collection</param>
         /// <returns>Service collection</returns>
-        public static IServiceCollection AddCors(this IServiceCollection services)
+        public static IServiceCollection AddCors(
+            this IServiceCollection services)
         {
             services.AddCors(options =>
             {

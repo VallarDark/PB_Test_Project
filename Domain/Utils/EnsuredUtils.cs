@@ -9,19 +9,44 @@ namespace Domain.Utils
 {
     public static class EnsuredUtils
     {
-        private const string DEFAULT_STRING_NOT_EMPTY_ERROR = "Parameter can't be null or empty";
-        private const string DEFAULT_STRING_LENGTH_ERROR = "Parameter length is not valid";
-        private const string DEFAULT_PASSWORD_VALIDATION_ERROR = "Password is not valid";
-        private const string DEFAULT_STRING_NOT_MATCH_PATTERN_ERROR = "Parameter should match the pattern";
-        private const string DEFAULT_NOT_NULL_ERROR = "Parameter can't be null";
-        private const string DEFAULT_NOT_EMPTY_COLLECTION_ERROR = "Collection can't be empty or null";
-        private const string DEFAULT_DUPLICATE_COLLECTION_ITEM_ERROR = "Collection already contains this item";
-        private const string DEFAULT_COLLECTION_ITEM_NOT_EXISTS_ERROR = "This item not exists in collection";
-        private const string DEFAULT_WRONG_COLLECTION_ITEMS_COUNT_ERROR = "Wrong collection items count";
-        private const string DEFAULT_NOMBER_IS_NON_NEGATIVE_ERROR = "Parameter can't be less than 0";
-        private const string DEFAULT_NOMBER_IS_LESS_THEN_VALUE_ERROR = "Parameter can't be less then value";
-        private const string DEFAULT_NOMBER_IS_MORE_THEN_VALUE_ERROR = "Parameter can't be more then value";
-        private const string DEFAULT_SAME_DATA_PARAM_ERROR = "Current element data is the same with new value";
+        private const string DEFAULT_STRING_NOT_EMPTY_ERROR =
+            "Parameter can't be null or empty";
+
+        private const string DEFAULT_STRING_LENGTH_ERROR =
+            "Parameter length is not valid";
+
+        private const string DEFAULT_PASSWORD_VALIDATION_ERROR =
+            "Password is not valid";
+
+        private const string DEFAULT_STRING_NOT_MATCH_PATTERN_ERROR =
+            "Parameter should match the pattern";
+
+        private const string DEFAULT_NOT_NULL_ERROR =
+            "Parameter can't be null";
+
+        private const string DEFAULT_NOT_EMPTY_COLLECTION_ERROR =
+            "Collection can't be empty or null";
+
+        private const string DEFAULT_DUPLICATE_COLLECTION_ITEM_ERROR =
+            "Collection already contains this item";
+
+        private const string DEFAULT_COLLECTION_ITEM_NOT_EXISTS_ERROR =
+            "This item not exists in collection";
+
+        private const string DEFAULT_WRONG_COLLECTION_ITEMS_COUNT_ERROR =
+            "Wrong collection items count";
+
+        private const string DEFAULT_NOMBER_IS_NON_NEGATIVE_ERROR =
+            "Parameter can't be less than 0";
+
+        private const string DEFAULT_NOMBER_IS_LESS_THEN_VALUE_ERROR =
+            "Parameter can't be less then value";
+
+        private const string DEFAULT_NOMBER_IS_MORE_THEN_VALUE_ERROR =
+            "Parameter can't be more then value";
+
+        private const string DEFAULT_SAME_DATA_PARAM_ERROR =
+            "Current element data is the same with new value";
 
         public static string EnsureStringIsNotEmptyAndMathPattern(
             string data,
@@ -173,27 +198,6 @@ namespace Domain.Utils
             }
 
             return nomber;
-        }
-
-        public static void EnsurePageParamsAreCorrect(
-            int pageNumber,
-            int countPerPage,
-            int minItemsCount,
-            int maxItemsCount)
-        {
-            EnsureNumberIsMoreOrEqualValue(pageNumber,
-                1,
-                "Invalid page number. Pagination starts from 1 st index");
-
-            EnsureNumberIsMoreOrEqualValue(
-                countPerPage,
-                minItemsCount,
-                $"Count can't be less then {minItemsCount}");
-
-            EnsureNumberIsLessOrEqualValue(
-                countPerPage,
-                maxItemsCount,
-                $"Count can't be more then {maxItemsCount}");
         }
 
         public static T EnsureNumberIsMoreOrEqualValue<T>(

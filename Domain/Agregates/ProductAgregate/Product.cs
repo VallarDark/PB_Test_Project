@@ -32,41 +32,67 @@ namespace Domain.Agregates.ProductAgregate
 
         public Product(
             string title,
-            ICollection<ProductCategory> categories,
             string description,
             string imgUrl,
             double price)
         {
-            Title = EnsuredUtils.EnsureStringLengthIsCorrect(title, MIN_LENGTH, MAX_LENGTH);
-            this.categories = EnsuredUtils.EnsureNotNull(categories);
-            Description = EnsuredUtils.EnsureStringLengthIsCorrect(description, MIN_LENGTH, MAX_DESCRIPTION_LENGTH);
-            ImgUrl = EnsuredUtils.EnsureStringLengthIsCorrect(imgUrl, MIN_LENGTH, MAX_URL_LENGTH);
+            Title = EnsuredUtils.EnsureStringLengthIsCorrect(
+                title,
+                MIN_LENGTH,
+                MAX_LENGTH);
+
+            Description = EnsuredUtils.EnsureStringLengthIsCorrect(
+                description,
+                MIN_LENGTH,
+                MAX_DESCRIPTION_LENGTH);
+
+            ImgUrl = EnsuredUtils.EnsureStringLengthIsCorrect(
+                imgUrl,
+                MIN_LENGTH,
+                MAX_URL_LENGTH);
+
             Price = EnsuredUtils.EnsureNumberIsMoreOrEqualValue(price, 0);
+
+            categories = new List<ProductCategory>();
         }
 
         public Product(ProductDto productDto)
         {
             id = EnsuredUtils.EnsureStringIsNotEmpty(productDto.Id);
-            Title = EnsuredUtils.EnsureStringLengthIsCorrect(productDto.Title, MIN_LENGTH, MAX_LENGTH);
-            categories = EnsuredUtils.EnsureNotNull(productDto.Categories.Select(c => new ProductCategory(c)).ToList());
-            Description = EnsuredUtils.EnsureStringLengthIsCorrect(productDto.Description, MIN_LENGTH, MAX_DESCRIPTION_LENGTH);
-            ImgUrl = EnsuredUtils.EnsureStringLengthIsCorrect(productDto.ImgUrl, MIN_LENGTH, MAX_URL_LENGTH);
+
+            Title = EnsuredUtils.EnsureStringLengthIsCorrect(
+                productDto.Title,
+                MIN_LENGTH,
+                MAX_LENGTH);
+
+            categories = EnsuredUtils.EnsureNotNull(
+                productDto.Categories.Select(c => new ProductCategory(c)).ToList());
+
+            Description = EnsuredUtils.EnsureStringLengthIsCorrect(
+                productDto.Description,
+                MIN_LENGTH,
+                MAX_DESCRIPTION_LENGTH);
+
+            ImgUrl = EnsuredUtils.EnsureStringLengthIsCorrect(
+                productDto.ImgUrl,
+                MIN_LENGTH,
+                MAX_URL_LENGTH);
+
             Price = EnsuredUtils.EnsureNumberIsMoreOrEqualValue(productDto.Price, 0);
         }
 
         public Unit ChangeDescription(string description)
         {
-            EnsuredUtils.EnsureNewValueIsNotSame(Description, description);
-
-            Description = EnsuredUtils.EnsureStringLengthIsCorrect(description, MIN_LENGTH, MAX_DESCRIPTION_LENGTH);
+            Description = EnsuredUtils.EnsureStringLengthIsCorrect(
+                description,
+                MIN_LENGTH,
+                MAX_DESCRIPTION_LENGTH);
 
             return default;
         }
 
         public Unit ChangePrice(double price)
         {
-            EnsuredUtils.EnsureNewValueIsNotSame(Price, price);
-
             Price = EnsuredUtils.EnsureNumberIsMoreOrEqualValue(price, 0);
 
             return default;
@@ -74,18 +100,20 @@ namespace Domain.Agregates.ProductAgregate
 
         public Unit ChangeImage(string imgUrl)
         {
-            EnsuredUtils.EnsureNewValueIsNotSame(ImgUrl, imgUrl);
-
-            ImgUrl = EnsuredUtils.EnsureStringLengthIsCorrect(imgUrl, MIN_LENGTH, MAX_URL_LENGTH);
+            ImgUrl = EnsuredUtils.EnsureStringLengthIsCorrect(
+                imgUrl,
+                MIN_LENGTH,
+                MAX_URL_LENGTH);
 
             return default;
         }
 
         public Unit ChangeTitle(string title)
         {
-            EnsuredUtils.EnsureNewValueIsNotSame(Title, title);
-
-            Title = EnsuredUtils.EnsureStringLengthIsCorrect(title, MIN_LENGTH, MAX_LENGTH);
+            Title = EnsuredUtils.EnsureStringLengthIsCorrect(
+                title,
+                MIN_LENGTH,
+                MAX_LENGTH);
 
             return default;
         }

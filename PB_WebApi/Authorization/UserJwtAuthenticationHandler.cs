@@ -13,6 +13,9 @@ namespace PB_WebApi.Authorization
     {
         private const string INVALID_AUTHORIZE_ERROR = "Invalid authorization data";
 
+        private const string NO_SECURITY_VALIDATOR =
+            "No SecurityTokenValidator available for token.";
+
         private readonly IUserService _userService;
         private readonly IUserTokenProvider _tokenProvider;
 
@@ -33,7 +36,10 @@ namespace PB_WebApi.Authorization
             string? token = null;
             try
             {
-                var messageReceivedContext = new MessageReceivedContext(Context, Scheme, Options);
+                var messageReceivedContext = new MessageReceivedContext(
+                    Context,
+                    Scheme,
+                    Options);
 
                 string? authorization = Context.Request.Headers.Authorization;
 
@@ -106,7 +112,10 @@ namespace PB_WebApi.Authorization
                                 continue;
                             }
 
-                            if (Enum.TryParse<UserRoleType>(EncodingUtils.DecodeData(role), true, out var roleType))
+                            if (Enum.TryParse<UserRoleType>(
+                                    EncodingUtils.DecodeData(role),
+                                    true,
+                                    out var roleType))
                             {
                                 var personalData = new UserValidationDto()
                                 {
@@ -129,7 +138,8 @@ namespace PB_WebApi.Authorization
                         {
                             Logger.LogError(ex.Message);
 
-                            if (Options.RefreshOnIssuerKeyNotFound && Options.ConfigurationManager != null
+                            if (Options.RefreshOnIssuerKeyNotFound
+                                && Options.ConfigurationManager != null
                                 && ex is SecurityTokenSignatureKeyNotFoundException)
                             {
                                 Options.ConfigurationManager.RequestRefresh();
@@ -147,14 +157,20 @@ namespace PB_WebApi.Authorization
 
                         if (validatedToken != null)
                         {
-                            var tokenValidatedContext = new TokenValidatedContext(Context, Scheme, Options)
+                            var tokenValidatedContext = new TokenValidatedContext(
+                                Context,
+                                Scheme,
+                                Options)
                             {
                                 Principal = principal,
                                 SecurityToken = validatedToken
                             };
 
-                            tokenValidatedContext.Properties.ExpiresUtc = GetSafeDateTime(validatedToken.ValidTo);
-                            tokenValidatedContext.Properties.IssuedUtc = GetSafeDateTime(validatedToken.ValidFrom);
+                            tokenValidatedContext.Properties.ExpiresUtc =
+                                GetSafeDateTime(validatedToken.ValidTo);
+
+                            tokenValidatedContext.Properties.IssuedUtc =
+                                GetSafeDateTime(validatedToken.ValidFrom);
 
                             if (tokenValidatedContext.Result != null)
                             {
@@ -165,7 +181,10 @@ namespace PB_WebApi.Authorization
                             {
                                 tokenValidatedContext.Properties.StoreTokens(new[]
                                 {
-                                    new AuthenticationToken { Name = "access_token", Value = token }
+                                    new AuthenticationToken {
+                                        Name = "access_token",
+                                        Value = token
+                                    }
                                 });
                             }
 
@@ -182,9 +201,14 @@ namespace PB_WebApi.Authorization
 
                 if (validationFailures != null)
                 {
-                    var authenticationFailedContext = new AuthenticationFailedContext(Context, Scheme, Options)
+                    var authenticationFailedContext = new AuthenticationFailedContext(
+                        Context,
+                        Scheme,
+                        Options)
                     {
-                        Exception = (validationFailures.Count == 1) ? validationFailures[0] : new AggregateException(validationFailures)
+                        Exception = (validationFailures.Count == 1) ?
+                            validationFailures[0] :
+                            new AggregateException(validationFailures)
                     };
 
                     if (authenticationFailedContext.Result != null)
@@ -195,11 +219,14 @@ namespace PB_WebApi.Authorization
                     return AuthenticateResult.Fail(authenticationFailedContext.Exception);
                 }
 
-                return AuthenticateResult.Fail("No SecurityTokenValidator available for token.");
+                return AuthenticateResult.Fail(NO_SECURITY_VALIDATOR);
             }
             catch (Exception ex)
             {
-                var authenticationFailedContext = new AuthenticationFailedContext(Context, Scheme, Options)
+                var authenticationFailedContext = new AuthenticationFailedContext(
+                    Context,
+                    Scheme,
+                    Options)
                 {
                     Exception = ex
                 };

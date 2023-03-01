@@ -43,7 +43,9 @@ namespace Services.UserAgregate
                          EncodingUtils.EncodeData(user.PersonalData.Email)),
                      new Claim(
                          ClaimType.Role.ToString(),
-                         EncodingUtils.EncodeData(Enum.GetName(typeof(UserRoleType), user.Role.RoleType))),
+                         EncodingUtils.EncodeData(
+                             Enum.GetName(typeof(UserRoleType),
+                             user.Role.RoleType))),
                      new Claim(
                          ClaimType.Sid.ToString(),
                          EncodingUtils.EncodeData(user.SessionToken)),

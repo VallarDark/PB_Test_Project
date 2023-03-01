@@ -21,7 +21,8 @@ namespace PB_WebApi.Authorization
                 return;
             }
 
-            if (_userService.CurrentUser == null || _userService.CurrentUser.Role.CompareTo(requirement.RequiredRole) < 0)
+            if (_userService.CurrentUser == null
+                || _userService.CurrentUser.Role.CompareTo(requirement.RequiredRole) < 0)
             {
                 context.Fail();
 
