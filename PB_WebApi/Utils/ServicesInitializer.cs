@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using PB_WebApi.Authorization;
+using PB_WebApi.Utils;
 using Persistence.EntityFramework.Context;
 using Services;
 using Services.ProductAgregate;
@@ -15,7 +16,7 @@ using Services.UserAgregate;
 using Services.Utils;
 using System.Reflection;
 
-namespace WebApi.Utils
+namespace PB_WebApi.Utils
 {
     /// <summary>
     /// Startup initializer

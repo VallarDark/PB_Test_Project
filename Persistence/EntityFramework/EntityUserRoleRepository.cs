@@ -29,7 +29,7 @@ namespace Persistence.EntityFramework
 
             if (addInnerItems)
             {
-                items.Include(r => r.Users);
+                items = items.Include(r => r.Users);
             }
 
             if (predicate == null)
@@ -126,7 +126,7 @@ namespace Persistence.EntityFramework
 
             if (addInnerItems)
             {
-                items.Include(r => r.Users);
+                items = items.Include(r => r.Users);
             }
 
             result = await items.FirstOrDefaultAsync(ur => ur.Id == id);

@@ -74,6 +74,26 @@ namespace Services.UserAgregate
             return _userTokenProvider.GenerateToken(existedUser);
         }
 
+        public async Task<Unit> LogOut()
+        {
+            if (currentUser == null)
+            {
+                return default;
+            }
+
+            EnsuredUtils.EnsureNotNull(
+               userRepository,
+               string.Format(REPOSITORY_DOES_NOT_EXISTS, nameof(userRepository)));
+
+            currentUser.GenerateNewSessionToken();
+
+            await userRepository.Update(currentUser);
+
+            currentUser = null;
+
+            return default;
+        }
+
         public async Task<User?> VerifyUser(UserValidationDto userValidationData)
         {
             EnsuredUtils.EnsureNotNull(

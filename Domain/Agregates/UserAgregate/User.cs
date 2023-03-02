@@ -11,10 +11,10 @@ namespace Domain.Agregates.UserAgregate
         private const string PASSWORD_PATTERN =
             @"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{3,}$";
 
-        private const int MIN_LENGHT = 6;
-        private const int MAX_LENGTH = 20;
-        private const int PASSWORD_MIN_LENGHT = 8;
-        private const int PASSWORD_MAX_LENGTH = 50;
+        public const int MIN_LENGHT = 6;
+        public const int MAX_LENGTH = 20;
+        public const int PASSWORD_MIN_LENGHT = 8;
+        public const int PASSWORD_MAX_LENGTH = 50;
 
         private readonly static Regex _passswordPattern;
 

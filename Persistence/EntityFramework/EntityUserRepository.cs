@@ -63,7 +63,7 @@ namespace Persistence.EntityFramework
 
             if (addInnerItems)
             {
-                items.Include(r => r.Role);
+                items = items.Include(r => r.Role);
             }
 
             if (predicate == null)
@@ -161,7 +161,7 @@ namespace Persistence.EntityFramework
 
             if (addInnerItems)
             {
-                items.Include(r => r.Role);
+                items = items.Include(r => r.Role);
             }
 
             result = await items.FirstOrDefaultAsync(u => u.Id == id);
@@ -189,7 +189,7 @@ namespace Persistence.EntityFramework
             if (existingItem.Role.RoleType != item.Role.RoleType)
             {
                 var dbRole = await _Db.Roles
-                    .FirstAsync(r => r.Id == item.Role.Id);
+                    .FirstOrDefaultAsync(r => r.Id == item.Role.Id);
 
                 if (dbRole == null)
                 {

@@ -163,12 +163,12 @@ namespace Services.ProductAgregate
                     string.Format(DEFAULT_ITEM_SHOULD_EXISTS_ERROR, nameof(ProductCategory)));
             }
 
-            if (existedItem.Name != category.Name)
+            if (!string.IsNullOrEmpty(category.Name) && existedItem.Name != category.Name)
             {
                 existedItem.ChangeName(category.Name);
             }
 
-            if (existedItem.Description != category.Description)
+            if (!string.IsNullOrEmpty(category.Description) && existedItem.Description != category.Description)
             {
                 existedItem.ChangeDescription(category.Description);
             }
@@ -198,22 +198,22 @@ namespace Services.ProductAgregate
                     string.Format(DEFAULT_ITEM_SHOULD_EXISTS_ERROR, nameof(Product)));
             }
 
-            if (existedItem.Title != product.Title)
+            if (!string.IsNullOrEmpty(product.Title) && existedItem.Title != product.Title)
             {
                 existedItem.ChangeTitle(product.Title);
             }
 
-            if (existedItem.Price != product.Price)
+            if (product.Price != 0 && existedItem.Price != product.Price)
             {
                 existedItem.ChangePrice(product.Price);
             }
 
-            if (existedItem.Description != product.Description)
+            if (!string.IsNullOrEmpty(product.Description) && existedItem.Description != product.Description)
             {
                 existedItem.ChangeDescription(product.Description);
             }
 
-            if (existedItem.ImgUrl != product.ImgUrl)
+            if (!string.IsNullOrEmpty(product.ImgUrl) && existedItem.ImgUrl != product.ImgUrl)
             {
                 existedItem.ChangeImage(product.ImgUrl);
             }

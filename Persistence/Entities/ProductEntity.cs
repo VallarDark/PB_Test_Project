@@ -1,8 +1,9 @@
 ﻿using Contracts;
+using Domain.Agregates.ProductAgregate;
 using System;
 using System.Collections.Generic;
 
-namespace Domain.Agregates.ProductAgregate
+namespace Persistence.Entities
 {
     public class ProductEntity : ValueObject, IEntity
     {
@@ -10,13 +11,23 @@ namespace Domain.Agregates.ProductAgregate
 
         public string Title { get; set; }
 
-        public ICollection<ProductCategoryEntity> Categories { get; set; }
-
         public string Description { get; set; }
 
         public string ImgUrl { get; set; }
 
         public double Price { get; set; }
+
+        public ICollection<ProductCategoryEntity> Categories { get; set; }
+
+        public ProductEntity()
+        {
+            Id = Guid.NewGuid().ToString();
+            Title = string.Empty;
+            Description = string.Empty;
+            ImgUrl = string.Empty;
+            Price = 0;
+            Categories = new List<ProductCategoryEntity>();
+        }
 
         public ProductEntity(Product product)
         {

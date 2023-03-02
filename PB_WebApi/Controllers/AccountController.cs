@@ -6,19 +6,32 @@ using PB_WebApi.Models;
 
 namespace PB_WebApi.Controllers
 {
+    /// <summary>
+    /// SignIn/SignOut Controller
+    /// </summary>
+
     [EnableCors("CrudPolicy")]
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
         private readonly IUserService _userService;
 
-        public AccountController(IConfiguration configuration, IUserService userService)
+        /// <summary>
+        /// Initialization
+        /// </summary>
+        /// <param name="userService"> User service</param>
+
+        public AccountController(IUserService userService)
         {
-            _configuration = configuration;
             _userService = userService;
         }
+
+        /// <summary>
+        /// Registration
+        /// </summary>
+        /// <param name="registrationModel"> Registration model</param>
+        /// <returns>HTTP success status | HTTP error</returns>
 
         [HttpPost("registration")]
         [AllowAnonymous]
@@ -38,6 +51,12 @@ namespace PB_WebApi.Controllers
             return Results.Ok(result);
         }
 
+        /// <summary>
+        /// Login
+        /// </summary>
+        /// <param name="loginModel"> Login model</param>
+        /// <returns>HTTP success status | HTTP error</returns>
+
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IResult> Login(UserLoginModel loginModel)
@@ -51,6 +70,20 @@ namespace PB_WebApi.Controllers
             var result = await _userService.LoginUser(userLoginDto);
 
             return Results.Ok(result);
+        }
+
+        /// <summary>
+        /// LogOut
+        /// </summary>
+        /// <returns>HTTP success status</returns>
+
+        [HttpPost("logout")]
+        [Authorize]
+        public async Task<IResult> LogOut()
+        {
+            await _userService.LogOut();
+
+            return Results.Ok("log out");
         }
     }
 }

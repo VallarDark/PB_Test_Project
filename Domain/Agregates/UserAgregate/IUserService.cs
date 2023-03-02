@@ -18,6 +18,8 @@ namespace Domain.Agregates.UserAgregate
 
         Task<string> LoginUser(UserLoginDto userData);
 
+        Task<Unit> LogOut();
+
         Task<User?> VerifyUser(UserValidationDto userValidationData);
 
         Task<PaginatedCollectionBase<User>> GetAllUsers(int pageNumber);

@@ -20,14 +20,14 @@ namespace Persistence.Entities
 
         public string LastName { get; set; }
 
-        public string? SessionToken { get; private set; }
+        public string? SessionToken { get; set; }
 
-        public UserEntity() : base()
+        public UserEntity()
         {
             Id = Guid.NewGuid().ToString();
             NickName = string.Empty;
             Password = string.Empty;
-            Role = null;
+            Role = new UserRoleEntity();
             Email = string.Empty;
             Name = string.Empty;
             LastName = string.Empty;

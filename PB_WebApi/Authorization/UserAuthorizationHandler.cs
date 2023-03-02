@@ -16,11 +16,6 @@ namespace PB_WebApi.Authorization
             AuthorizationHandlerContext context,
             UserRoleRequirement requirement)
         {
-            if (context.HasFailed)
-            {
-                return;
-            }
-
             if (_userService.CurrentUser == null
                 || _userService.CurrentUser.Role.CompareTo(requirement.RequiredRole) < 0)
             {

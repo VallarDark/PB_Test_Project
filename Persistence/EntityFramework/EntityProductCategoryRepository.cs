@@ -5,6 +5,7 @@ using Domain.Exceptions;
 using Domain.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FSharp.Core;
+using Persistence.Entities;
 using Persistence.EntityFramework.Context;
 using Persistence.Utils;
 using System;
@@ -64,7 +65,7 @@ namespace Persistence.EntityFramework
 
             if (addInnerItems)
             {
-                items.Include(r => r.Products);
+                items = items.Include(r => r.Products);
             }
 
             if (predicate == null)
@@ -162,7 +163,7 @@ namespace Persistence.EntityFramework
 
             if (addInnerItems)
             {
-                items.Include(r => r.Products);
+                items = items.Include(r => r.Products);
             }
 
             result = await items.FirstOrDefaultAsync(i => i.Id == id);

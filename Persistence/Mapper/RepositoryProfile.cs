@@ -10,37 +10,40 @@ namespace Persistence.Mapper
         public RepositoryProfile()
         {
             CreateMap<User, UserEntity>()
-            .ForMember(ue => ue.Email, act => act.MapFrom(u => u.PersonalData.Email))
-            .ForMember(ue => ue.Name, act => act.MapFrom(u => u.PersonalData.Name))
-            .ForMember(ue => ue.LastName, act => act.MapFrom(u => u.PersonalData.LastName));
+                .ForMember(ue => ue.Id, act => act.MapFrom(u => u.Id))
+                .ForMember(ue => ue.Email, act => act.MapFrom(u => u.PersonalData.Email))
+                .ForMember(ue => ue.Name, act => act.MapFrom(u => u.PersonalData.Name))
+                .ForMember(ue => ue.LastName, act => act.MapFrom(u => u.PersonalData.LastName));
 
             CreateMap<UserEntity, User>()
-            .ForPath(u => u.PersonalData.Email, act => act.MapFrom(ue => ue.Email))
-            .ForPath(u => u.PersonalData.Name, act => act.MapFrom(ue => ue.Name))
-            .ForPath(u => u.PersonalData.LastName, act => act.MapFrom(ue => ue.LastName));
-
+                .ForMember(ue => ue.Id, act => act.MapFrom(u => u.Id))
+                .ForPath(u => u.PersonalData.Email, act => act.MapFrom(ue => ue.Email))
+                .ForPath(u => u.PersonalData.Name, act => act.MapFrom(ue => ue.Name))
+                .ForPath(u => u.PersonalData.LastName, act => act.MapFrom(ue => ue.LastName));
 
             CreateMap<UserRole, UserRoleEntity>()
-            .ForMember(ue => ue.Users, act => act.Ignore())
-            .ReverseMap();
+                .ForMember(ue => ue.Users, act => act.Ignore())
+                .ReverseMap();
 
             CreateMap<UserEntity, UserDto>()
-            .ReverseMap();
+                .ReverseMap();
 
             CreateMap<UserRoleEntity, UserRoleDto>()
-            .ReverseMap();
+                .ReverseMap();
 
             CreateMap<Product, ProductEntity>()
-            .ReverseMap();
+                .ForMember(ue => ue.Id, act => act.MapFrom(u => u.Id))
+                .ReverseMap();
 
             CreateMap<ProductCategory, ProductCategoryEntity>()
-            .ReverseMap();
+                .ForMember(ue => ue.Id, act => act.MapFrom(u => u.Id))
+                .ReverseMap();
 
             CreateMap<ProductEntity, ProductDto>()
-            .ReverseMap();
+                .ReverseMap();
 
             CreateMap<ProductCategoryEntity, ProductCategoryDto>()
-            .ReverseMap();
+                .ReverseMap();
         }
     }
 }

@@ -9,11 +9,11 @@ namespace Persistence.Entities
     {
         public string Id { get; set; }
 
-        public UserRoleType RoleType { get; set; }
+        public virtual UserRoleType RoleType { get; set; }
 
         public virtual ICollection<UserEntity> Users { get; set; }
 
-        public UserRoleEntity() : base()
+        public UserRoleEntity()
         {
             Id = Guid.NewGuid().ToString();
             RoleType = UserRoleType.User;

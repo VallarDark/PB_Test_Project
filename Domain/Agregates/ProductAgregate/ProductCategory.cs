@@ -9,9 +9,9 @@ namespace Domain.Agregates.ProductAgregate
 {
     public class ProductCategory : ValueObject, IEntity
     {
-        private const int MIN_LENGTH = 2;
-        private const int MAX_LENGTH = 25;
-        private const int MAX_DESCRIPTION_LENGTH = 500;
+        public const int MIN_LENGTH = 2;
+        public const int MAX_LENGTH = 25;
+        public const int MAX_DESCRIPTION_LENGTH = 500;
 
         private ICollection<Product> products = new List<Product>();
 
