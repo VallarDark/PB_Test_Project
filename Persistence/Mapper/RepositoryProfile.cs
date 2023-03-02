@@ -26,23 +26,37 @@ namespace Persistence.Mapper
                 .ReverseMap();
 
             CreateMap<UserEntity, UserDto>()
+                .ForMember(ue => ue.Id, act => act.MapFrom(u => u.Id))
                 .ReverseMap();
 
             CreateMap<UserRoleEntity, UserRoleDto>()
+                .ForMember(ue => ue.Id, act => act.MapFrom(u => u.Id))
                 .ReverseMap();
 
             CreateMap<Product, ProductEntity>()
+                .ForMember(ue => ue.Categories, act => act.MapFrom(u => u.Categories))
                 .ForMember(ue => ue.Id, act => act.MapFrom(u => u.Id))
+                .PreserveReferences()
                 .ReverseMap();
 
             CreateMap<ProductCategory, ProductCategoryEntity>()
+                .ForMember(ue => ue.Products, act => act.MapFrom(u => u.Products))
                 .ForMember(ue => ue.Id, act => act.MapFrom(u => u.Id))
+                .PreserveReferences()
                 .ReverseMap();
 
             CreateMap<ProductEntity, ProductDto>()
+                .ForMember(ue => ue.Id, act => act.MapFrom(u => u.Id))
+                .ForMember(ue => ue.Categories, act => act.MapFrom(u => u.Categories))
+                .ForMember(ue => ue.CyclicDepth, act => act.MapFrom(u => 1))
+                .PreserveReferences()
                 .ReverseMap();
 
             CreateMap<ProductCategoryEntity, ProductCategoryDto>()
+                .ForMember(ue => ue.Id, act => act.MapFrom(u => u.Id))
+                .ForMember(ue => ue.Products, act => act.MapFrom(u => u.Products))
+                .ForMember(ue => ue.CyclicDepth, act => act.MapFrom(u => 1))
+                .PreserveReferences()
                 .ReverseMap();
         }
     }

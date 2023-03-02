@@ -4,6 +4,7 @@ using Domain.Agregates.UserAgregate;
 using Domain.Exceptions;
 using Domain.Utils;
 using Microsoft.FSharp.Core;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Services.ProductAgregate
@@ -163,12 +164,14 @@ namespace Services.ProductAgregate
                     string.Format(DEFAULT_ITEM_SHOULD_EXISTS_ERROR, nameof(ProductCategory)));
             }
 
-            if (!string.IsNullOrEmpty(category.Name) && existedItem.Name != category.Name)
+            if (!string.IsNullOrEmpty(category.Name)
+                && existedItem.Name != category.Name)
             {
                 existedItem.ChangeName(category.Name);
             }
 
-            if (!string.IsNullOrEmpty(category.Description) && existedItem.Description != category.Description)
+            if (!string.IsNullOrEmpty(category.Description)
+                && existedItem.Description != category.Description)
             {
                 existedItem.ChangeDescription(category.Description);
             }
@@ -198,7 +201,8 @@ namespace Services.ProductAgregate
                     string.Format(DEFAULT_ITEM_SHOULD_EXISTS_ERROR, nameof(Product)));
             }
 
-            if (!string.IsNullOrEmpty(product.Title) && existedItem.Title != product.Title)
+            if (!string.IsNullOrEmpty(product.Title)
+                && existedItem.Title != product.Title)
             {
                 existedItem.ChangeTitle(product.Title);
             }
@@ -208,12 +212,14 @@ namespace Services.ProductAgregate
                 existedItem.ChangePrice(product.Price);
             }
 
-            if (!string.IsNullOrEmpty(product.Description) && existedItem.Description != product.Description)
+            if (!string.IsNullOrEmpty(product.Description)
+                && existedItem.Description != product.Description)
             {
                 existedItem.ChangeDescription(product.Description);
             }
 
-            if (!string.IsNullOrEmpty(product.ImgUrl) && existedItem.ImgUrl != product.ImgUrl)
+            if (!string.IsNullOrEmpty(product.ImgUrl)
+                && existedItem.ImgUrl != product.ImgUrl)
             {
                 existedItem.ChangeImage(product.ImgUrl);
             }
@@ -223,7 +229,9 @@ namespace Services.ProductAgregate
             return existedItem;
         }
 
-        public async Task<Unit> AddProductToCategory(string productId, string categoryId)
+        public async Task<Unit> AddProductToCategory(
+            string productId,
+            string categoryId)
         {
             return await ProductCategoryInteractionInner(
                 productId,
@@ -231,7 +239,9 @@ namespace Services.ProductAgregate
                 ActionType.Add);
         }
 
-        public async Task<Unit> RemoveProductFromCategory(string productId, string categoryId)
+        public async Task<Unit> RemoveProductFromCategory(
+            string productId,
+            string categoryId)
         {
             return await ProductCategoryInteractionInner(
                 productId,
@@ -245,12 +255,18 @@ namespace Services.ProductAgregate
             Remove
         }
 
-        private async Task<Unit> ProductCategoryInteractionInner(string productId, string categoryId, ActionType action)
+        private async Task<Unit> ProductCategoryInteractionInner(
+            string productId,
+            string categoryId,
+            ActionType action)
         {
             if (!_userService.DoesUserHavePermission(UserRoleType.Admin))
             {
                 throw new LowPrevilegiesLevelException(DEFAULT_LOW_PREVILEGIES_LEVEL_ERROR);
             }
+
+            EnsuredUtils.EnsureStringIsNotEmpty(productId);
+            EnsuredUtils.EnsureStringIsNotEmpty(categoryId);
 
             EnsuredUtils.EnsureNotNull(
                 productRepository,
@@ -270,7 +286,7 @@ namespace Services.ProductAgregate
             }
 
             var existedCategory = await productCategoryRepository
-                .Get(c => c.Id == categoryId);
+                .Get(c => c.Id == categoryId, addInnerItems: true);
 
             if (existedCategory == null)
             {
@@ -282,11 +298,23 @@ namespace Services.ProductAgregate
             {
                 case ActionType.Add:
                     {
+                        if (existedCategory.Products.Any(p => p.Id == existedProduct.Id))
+                        {
+                            throw new ItemAlreadyExistsException(
+                                string.Format(DEFAULT_ITEM_ALREADY_IN_COLLECTION_ERROR, "product", "category"));
+                        }
+
                         existedCategory.AddProduct(existedProduct);
                     }
                     break;
                 case ActionType.Remove:
                     {
+                        if (existedCategory.Products.All(p => p.Id != existedProduct.Id))
+                        {
+                            throw new ItemNotExistsException(
+                                string.Format(DEFAULT_ITEM_NOT_IN_COLLECTION_ERROR, "product", "category"));
+                        }
+
                         existedCategory.RemoveProduct(existedProduct);
                     }
                     break;

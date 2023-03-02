@@ -11,5 +11,7 @@ namespace Domain.Agregates.ProductAgregate
         public string Description { get; set; }
 
         public ICollection<ProductDto> Products { get; set; }
+
+        public int CyclicDepth { get; set; }
     }
 }

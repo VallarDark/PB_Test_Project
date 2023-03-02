@@ -22,7 +22,7 @@ namespace Persistence.Utils
 
             foreach (var item in oldCollection)
             {
-                var sameIdItem = newCollection.FirstOrDefault(item => item.Id == item.Id);
+                var sameIdItem = newCollection.FirstOrDefault(ni => ni.Id == item.Id);
 
                 if (sameIdItem == default)
                 {
@@ -39,7 +39,7 @@ namespace Persistence.Utils
 
             foreach (var item in newCollection)
             {
-                var sameIdItem = oldCollection.FirstOrDefault(item => item.Id == item.Id);
+                var sameIdItem = oldCollection.FirstOrDefault(oi => oi.Id == item.Id);
 
                 if (sameIdItem == default)
                 {

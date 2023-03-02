@@ -52,7 +52,8 @@ namespace PB_WebApi.Controllers
 
         [RequedRoleAuthorize(UserRoleType.Admin)]
         [HttpPost, Authorize]
-        public async Task<ProductCategory> CreateCategory([FromBody] ProductCategoryCreationModel data)
+        public async Task<ProductCategory> CreateCategory(
+            [FromBody] ProductCategoryCreationModel data)
         {
             var creationData = new ProductCategoryChangeDto()
             {
@@ -90,12 +91,49 @@ namespace PB_WebApi.Controllers
         /// Delete category by id
         /// </summary>
         /// <param name="id">Category id</param>
+        /// <returns>HTTP OK</returns>
 
         [RequedRoleAuthorize(UserRoleType.Admin)]
         [HttpDelete("{id}"), Authorize]
         public async Task<IResult> Delete(string id)
         {
             await _productService.RemoveCategory(id);
+
+            return Results.Ok();
+        }
+
+        /// <summary>
+        /// Add existing product to category by id
+        /// </summary>
+        /// <param name="categoryId">Category id</param>   
+        /// <param name="productId">ProductId id</param>   
+        /// <returns>HTTP OK</returns>
+
+        [RequedRoleAuthorize(UserRoleType.Admin)]
+        [HttpPost("{categoryId}/addProduct"), Authorize]
+        public async Task<IResult> AddProductToCategory(
+            string categoryId,
+            [FromBody] string productId)
+        {
+            await _productService.AddProductToCategory(productId, categoryId);
+
+            return Results.Ok();
+        }
+
+        /// <summary>
+        /// Remove existing product from category by id
+        /// </summary>
+        /// <param name="categoryId">Category id</param>   
+        /// <param name="productId">ProductId id</param>   
+        /// <returns>HTTP OK</returns>
+
+        [RequedRoleAuthorize(UserRoleType.Admin)]
+        [HttpPost("{categoryId}/removeProduct"), Authorize]
+        public async Task<IResult> RemoveProductFromCategory(
+            string categoryId,
+            [FromBody] string productId)
+        {
+            await _productService.RemoveProductFromCategory(productId, categoryId);
 
             return Results.Ok();
         }

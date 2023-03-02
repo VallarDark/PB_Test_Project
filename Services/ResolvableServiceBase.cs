@@ -14,6 +14,12 @@ namespace Services
         protected const string DEFAULT_ITEM_SHOULD_NOT_EXISTS_ERROR =
             "{0} with same data already exists";
 
+        protected const string DEFAULT_ITEM_ALREADY_IN_COLLECTION_ERROR =
+            "{0} already exists in this {1}";
+
+        protected const string DEFAULT_ITEM_NOT_IN_COLLECTION_ERROR =
+            "{0} not exists in this {1}";
+
         protected const string DEFAULT_LOW_PREVILEGIES_LEVEL_ERROR =
             "Your access level too low";
 

@@ -65,8 +65,21 @@ namespace Domain.Agregates.ProductAgregate
                 MIN_LENGTH,
                 MAX_LENGTH);
 
-            categories = EnsuredUtils.EnsureNotNull(
-                productDto.Categories.Select(c => new ProductCategory(c)).ToList());
+            if (productDto.CyclicDepth < 1)
+            {
+                categories = new List<ProductCategory>();
+            }
+            else
+            {
+                EnsuredUtils.EnsureNotNull(productDto.Categories);
+
+                foreach (var item in productDto.Categories)
+                {
+                    item.CyclicDepth--;
+                }
+
+                categories = productDto.Categories.Select(c => new ProductCategory(c)).ToList();
+            }
 
             Description = EnsuredUtils.EnsureStringLengthIsCorrect(
                 productDto.Description,
