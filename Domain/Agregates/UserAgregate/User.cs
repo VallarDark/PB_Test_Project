@@ -37,6 +37,8 @@ namespace Domain.Agregates.UserAgregate
 
         public UserRole Role { get; private set; }
 
+        public RepositoryType RepositoryType { get; private set; }
+
         public Unit UpdateRole(UserRole role)
         {
             EnsuredUtils.EnsureNotNull(role);
@@ -63,6 +65,13 @@ namespace Domain.Agregates.UserAgregate
                 nickName,
                 MIN_LENGHT,
                 MAX_LENGTH);
+
+            return default;
+        }
+
+        public Unit ChangeRepositoryType(RepositoryType repositoryType)
+        {
+            RepositoryType = repositoryType;
 
             return default;
         }

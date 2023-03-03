@@ -25,6 +25,19 @@ namespace Services.UserAgregate
 
         public User? CurrentUser => currentUser;
 
+        public override RepositoryType RepositoryType
+        {
+            get
+            {
+                if (currentUser != null)
+                {
+                    return currentUser.RepositoryType;
+                }
+
+                return base.RepositoryType;
+            }
+        }
+
         public bool DoesUserHavePermission(UserRoleType permission)
         {
             EnsuredUtils.EnsureNotNull(currentUser, DEFAULT_UNAUTHORISED_ERROR);
@@ -212,6 +225,23 @@ namespace Services.UserAgregate
             existedUser.UpdateRole(role);
 
             return await userRepository.Update(existedUser);
+        }
+
+        public async Task<Unit> ChangeRepositoryType(RepositoryType repositoryType)
+        {
+            EnsuredUtils.EnsureNotNull(
+                userRepository,
+                string.Format(REPOSITORY_DOES_NOT_EXISTS, nameof(userRepository)));
+
+            if (currentUser == null)
+            {
+                throw new ItemNotExistsException(
+                    string.Format(DEFAULT_ITEM_SHOULD_EXISTS_ERROR, nameof(User)));
+            }
+
+            currentUser.ChangeRepositoryType(repositoryType);
+
+            return await userRepository.Update(currentUser);
         }
     }
 }

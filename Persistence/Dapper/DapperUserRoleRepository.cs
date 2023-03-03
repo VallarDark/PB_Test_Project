@@ -1,5 +1,8 @@
-﻿using Contracts;
+﻿using AutoMapper;
+using Contracts;
 using Domain.Agregates.UserAgregate;
+using Persistence.Dapper.Context;
+using Persistence.EntityFramework;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -7,9 +10,11 @@ using System.Threading.Tasks;
 
 namespace Persistence.Dapper
 {
-    public class DapperUserRoleRepository : IUserRoleRepository
+    public class DapperUserRoleRepository : DapperRepositoryBase, IUserRoleRepository
     {
-        public string ServiceType => RepositoryType.Dapper.ToString();
+        public DapperUserRoleRepository(DapperContext db, IMapper mapper) : base(db, mapper)
+        {
+        }
 
         public Task<UserRole?> Get(Expression<Func<UserRole, bool>>? predicate = null, bool addInnerItems = false)
         {

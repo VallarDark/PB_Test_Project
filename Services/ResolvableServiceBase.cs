@@ -28,13 +28,11 @@ namespace Services
 
         protected readonly IRepositoryResolver _RepositoryResolver;
 
-        public RepositoryType RepositoryType { get; set; }
+        public virtual RepositoryType RepositoryType => RepositoryType.EntityFramework;
 
         public ResolvableServiceBase(IRepositoryResolver repositoryResolver)
         {
             _RepositoryResolver = repositoryResolver;
-
-            RepositoryType = RepositoryType.EntityFramework;
         }
     }
 }

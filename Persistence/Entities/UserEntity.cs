@@ -22,6 +22,9 @@ namespace Persistence.Entities
 
         public string? SessionToken { get; set; }
 
+        public RepositoryType RepositoryType { get; set; }
+
+
         public UserEntity()
         {
             Id = Guid.NewGuid().ToString();
@@ -32,6 +35,7 @@ namespace Persistence.Entities
             Name = string.Empty;
             LastName = string.Empty;
             SessionToken = string.Empty;
+            RepositoryType = RepositoryType.EntityFramework;
         }
 
         public UserEntity(User user)
@@ -44,6 +48,7 @@ namespace Persistence.Entities
             Name = user.PersonalData.Name;
             LastName = user.PersonalData.LastName;
             SessionToken = user.SessionToken;
+            RepositoryType = user.RepositoryType;
         }
 
         public Guid Update(User user)
@@ -54,6 +59,7 @@ namespace Persistence.Entities
             Name = user.PersonalData.Name;
             LastName = user.PersonalData.LastName;
             SessionToken = user.SessionToken;
+            RepositoryType = user.RepositoryType;
 
             return default;
         }

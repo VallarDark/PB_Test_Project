@@ -1,4 +1,6 @@
-﻿namespace Domain.Agregates.UserAgregate
+﻿using Contracts;
+
+namespace Domain.Agregates.UserAgregate
 {
     public class UserDto
     {
@@ -17,5 +19,7 @@
         public string SessionToken { get; private set; }
 
         public UserRoleDto Role { get; set; }
+
+        public RepositoryType RepositoryType { get; set; }
     }
 }

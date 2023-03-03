@@ -1,4 +1,6 @@
-﻿using Domain.Agregates.UserAgregate;
+﻿using Contracts;
+using Domain.Agregates.UserAgregate;
+using Domain.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Persistence.Entities;
@@ -37,23 +39,15 @@ namespace Persistence.EntityFramework.Context
                 RoleType = UserRoleType.User
             };
 
-            var admin = new UserEntity()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Email = "admin@email.com",
-                LastName = "Admin",
-                Name = "Admin",
-                NickName = "Administrator",
-                Password = "UXdlcnR5MTIzIQ==",
-                Role = adminRole,
-                SessionToken = Guid.NewGuid().ToString()
-            };
-
             modelBuilder.Entity<UserEntity>()
                 .HasKey(u => u.Id);
 
             modelBuilder.Entity<UserRoleEntity>()
                 .HasKey(u => u.Id);
+
+            modelBuilder.Entity<UserEntity>()
+                .Property(r => r.RepositoryType)
+                .HasConversion<int>();
 
             modelBuilder.Entity<UserRoleEntity>()
                 .Property(r => r.RoleType)
@@ -73,6 +67,7 @@ namespace Persistence.EntityFramework.Context
                 .HasMany(p => p.Categories)
                 .WithMany(c => c.Products);
 
+
             modelBuilder.Entity<UserRoleEntity>()
                 .HasData(
                     adminRole,
@@ -83,14 +78,15 @@ namespace Persistence.EntityFramework.Context
                 .HasData(
                     new
                     {
-                        Id = admin.Id,
-                        Email = admin.Email,
-                        LastName = admin.LastName,
-                        Name = admin.Name,
-                        NickName = admin.NickName,
-                        Password = admin.Password,
+                        Id = Guid.NewGuid().ToString(),
+                        Email = _configuration["Admin:email"],
+                        LastName = "Administrator",
+                        Name = "Administrator",
+                        NickName = "Administrator",
+                        Password = EncodingUtils.EncodeData(_configuration["Admin:password"]),
                         RoleId = adminRole.Id,
-                        SessionToken = adminRole.Id
+                        SessionToken = Guid.NewGuid().ToString(),
+                        RepositoryType = RepositoryType.EntityFramework
                     }
                 );
 
@@ -99,11 +95,8 @@ namespace Persistence.EntityFramework.Context
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite(
-                $@"Data Source={_configuration["Db:DataSource"]}",
-                b => b.MigrationsAssembly("PB_WebApi"));
+            optionsBuilder.UseSqlite(_configuration["Db:ConnectionString"],
+                b => b.MigrationsAssembly(_configuration["Db:MigrationAssembly"]));
         }
-
-
     }
 }

@@ -29,6 +29,19 @@ namespace Services.ProductAgregate
             _userService = userService;
         }
 
+        public override RepositoryType RepositoryType
+        {
+            get
+            {
+                if (_userService.CurrentUser != null)
+                {
+                    return _userService.CurrentUser.RepositoryType;
+                }
+
+                return base.RepositoryType;
+            }
+        }
+
         public async Task<ProductCategory> CreateCategory(ProductCategoryChangeDto category)
         {
             if (!_userService.DoesUserHavePermission(UserRoleType.Admin))

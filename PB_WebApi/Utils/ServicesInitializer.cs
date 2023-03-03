@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using PB_WebApi.Authorization;
 using PB_WebApi.Utils;
+using Persistence.Dapper.Context;
 using Persistence.EntityFramework.Context;
 using Services;
 using Services.ProductAgregate;
@@ -66,6 +67,7 @@ namespace PB_WebApi.Utils
             services.AddAutoMapper(cfg => cfg.AddExpressionMapping(), assembly);
 
             services.AddDbContext<PbDbContext>();
+            services.AddSingleton<DapperContext>();
 
             services.AddTransient<IUserRepository>(allAsssemblyTypes);
             services.AddTransient<IUserRoleRepository>(allAsssemblyTypes);

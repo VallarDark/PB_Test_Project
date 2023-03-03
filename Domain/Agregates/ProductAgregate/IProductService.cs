@@ -6,7 +6,7 @@ namespace Domain.Agregates.ProductAgregate
 {
     public interface IProductService
     {
-        RepositoryType RepositoryType { get; set; }
+        RepositoryType RepositoryType { get; }
 
         Task<ProductCategory> CreateCategory(ProductCategoryChangeDto category);
 

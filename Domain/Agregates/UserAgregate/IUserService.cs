@@ -10,7 +10,7 @@ namespace Domain.Agregates.UserAgregate
 
         bool DoesUserHavePermission(UserRoleType permission);
 
-        RepositoryType RepositoryType { get; set; }
+        RepositoryType RepositoryType { get; }
 
         Task<string> RegisterCasualUser(UserRegistrationDto userData);
 
@@ -19,6 +19,8 @@ namespace Domain.Agregates.UserAgregate
         Task<string> LoginUser(UserLoginDto userData);
 
         Task<Unit> LogOut();
+
+        Task<Unit> ChangeRepositoryType(RepositoryType repositoryType);
 
         Task<User?> VerifyUser(UserValidationDto userValidationData);
 

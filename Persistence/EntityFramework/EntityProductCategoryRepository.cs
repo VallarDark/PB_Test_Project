@@ -18,8 +18,6 @@ namespace Persistence.EntityFramework
 {
     public class EntityProductCategoryRepository : EntityRepositoryBase, IProductCategoryRepository
     {
-        private const string ITEM_NOT_EXISTS_EXCEPTION = "Current {0} does not exists";
-
         public EntityProductCategoryRepository(
             PbDbContext db,
             IMapper mapper) : base(db, mapper)

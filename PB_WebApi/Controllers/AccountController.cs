@@ -1,4 +1,5 @@
-﻿using Domain.Agregates.UserAgregate;
+﻿using Contracts;
+using Domain.Agregates.UserAgregate;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -83,7 +84,21 @@ namespace PB_WebApi.Controllers
         {
             await _userService.LogOut();
 
-            return Results.Ok("log out");
+            return Results.Ok("Logged out");
+        }
+
+        /// <summary>
+        /// Change repository type
+        /// </summary>
+        /// <returns>HTTP success status</returns>
+
+        [HttpPost("changeRepository")]
+        [Authorize]
+        public async Task<IResult> ChangeRepository([FromBody] RepositoryType repositoryType)
+        {
+            await _userService.ChangeRepositoryType(repositoryType);
+
+            return Results.Ok("Repository changed");
         }
     }
 }
