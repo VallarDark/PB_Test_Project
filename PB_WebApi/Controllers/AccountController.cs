@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using PB_WebApi.Models;
+using PB_WebApi.Utils;
 
 namespace PB_WebApi.Controllers
 {
@@ -47,9 +48,16 @@ namespace PB_WebApi.Controllers
                 Password = registrationModel.Password
             };
 
-            var result = await _userService.RegisterCasualUser(userRegistrationDto);
+            try
+            {
+                var result = await _userService.RegisterCasualUser(userRegistrationDto);
 
-            return Results.Ok(result);
+                return Results.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return ex.Handle();
+            }
         }
 
         /// <summary>
@@ -68,9 +76,16 @@ namespace PB_WebApi.Controllers
                 Password = loginModel.Password
             };
 
-            var result = await _userService.LoginUser(userLoginDto);
+            try
+            {
+                var result = await _userService.LoginUser(userLoginDto);
 
-            return Results.Ok(result);
+                return Results.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return ex.Handle();
+            }
         }
 
         /// <summary>

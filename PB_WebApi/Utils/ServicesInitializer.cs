@@ -5,10 +5,8 @@ using Domain.Agregates.UserAgregate;
 using Domain.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using PB_WebApi.Authorization;
-using PB_WebApi.Utils;
 using Persistence.Dapper.Context;
 using Persistence.EntityFramework.Context;
 using Services;
@@ -151,27 +149,7 @@ namespace PB_WebApi.Utils
         /// </summary>
         /// <param name="services">Service collection</param>
         /// <returns>Service collection</returns>
-        public static IServiceCollection AddConfiguredControllers(
-            this IServiceCollection services)
-        {
-            services.AddControllers(config =>
-            {
-                var policy = new AuthorizationPolicyBuilder()
-                                 .RequireAuthenticatedUser()
-                                 .Build();
-
-                config.Filters.Add(new AuthorizeFilter(policy));
-            });
-
-            return services;
-        }
-
-        /// <summary>
-        /// Add Controllers with authorization
-        /// </summary>
-        /// <param name="services">Service collection</param>
-        /// <returns>Service collection</returns>
-        public static IServiceCollection AddCors(
+        public static IServiceCollection AddConfiguredCors(
             this IServiceCollection services)
         {
             services.AddCors(options =>
