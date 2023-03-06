@@ -1,0 +1,39 @@
+﻿.sign-link {
+    border: 1px solid;
+    border-radius: 5px;
+    margin: auto;
+    padding: 4px 15px 4px 15px;
+}
+
+    .sign-link:hover {
+        cursor: pointer;
+    }
+
+.sign-out {
+    color: rgb(185, 60, 45);
+    border-color: rgb(185, 60, 45);
+    background-color: rgb(245, 230, 230);
+}
+
+    .sign-out:hover {
+        background-color: rgb(245, 200, 200);
+    }
+
+.sign-in {
+    color: rgb(45, 60, 185);
+    border-color: rgb(45, 60, 185);
+    background-color: rgb(230, 230, 245);
+}
+
+    .sign-in:hover {
+        background-color: rgb(200, 200, 245);
+    }
+
+.nav-panel {
+    display: flex;
+    margin: auto;
+}
+
+.sign-name {
+    padding: 4px 10px 4px 15px;
+}

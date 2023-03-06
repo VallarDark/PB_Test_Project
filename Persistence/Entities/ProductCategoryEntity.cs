@@ -1,5 +1,5 @@
 ﻿using Contracts;
-using Domain.Agregates.ProductAgregate;
+using Domain.Aggregates.ProductAggregate;
 using System;
 using System.Collections.Generic;
 

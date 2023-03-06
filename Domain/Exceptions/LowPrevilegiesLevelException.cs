@@ -2,9 +2,9 @@
 
 namespace Domain.Exceptions
 {
-    public class LowPrevilegiesLevelException : Exception
+    public class LowPrevilegesLevelException : Exception
     {
-        public LowPrevilegiesLevelException(string message) : base(message)
+        public LowPrevilegesLevelException(string message) : base(message)
         {
         }
     }

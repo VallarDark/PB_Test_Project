@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Contracts;
-using Domain.Agregates.ProductAgregate;
+using Domain.Aggregates.ProductAggregate;
 using Microsoft.FSharp.Core;
 using Persistence.Dapper.Context;
 using System;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace Persistence.EntityFramework
+namespace Persistence.Dapper
 {
     public class DapperProductCategoryRepository : DapperRepositoryBase, IProductCategoryRepository
     {

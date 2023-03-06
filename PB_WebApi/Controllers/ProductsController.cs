@@ -1,11 +1,10 @@
-﻿using Contracts;
-using Domain.Agregates.ProductAgregate;
-using Domain.Agregates.UserAgregate;
+﻿using Domain.Aggregates.ProductAggregate;
+using Domain.Aggregates.UserAggregate;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using PB_WebApi.Authorization;
-using PB_WebApi.Models;
+using PresentationModels.Models;
 
 namespace PB_WebApi.Controllers
 {
@@ -38,9 +37,9 @@ namespace PB_WebApi.Controllers
         /// <returns>Paginated collection of products</returns>
 
         [HttpGet("page/{pageNumber}"), Authorize]
-        public async Task<PaginatedCollectionBase<Product>> GetProducts(int pageNumber)
+        public async Task<IActionResult> GetProducts(int pageNumber)
         {
-            return await _productService.GetProducts(pageNumber);
+            return Ok(await _productService.GetProducts(pageNumber));
         }
 
         /// <summary>
@@ -49,9 +48,9 @@ namespace PB_WebApi.Controllers
         /// <param name="data">Product creation data</param>   
         /// <returns>New product</returns>
 
-        [RequedRoleAuthorize(UserRoleType.Admin)]
+        [RequiredRoleAuthorize(UserRoleType.Admin)]
         [HttpPost, Authorize]
-        public async Task<Product> CreateProduct([FromBody] ProductCreationModel data)
+        public async Task<IActionResult> CreateProduct([FromBody] ProductCreationModel data)
         {
             var creationData = new ProductChangeDto()
             {
@@ -61,7 +60,7 @@ namespace PB_WebApi.Controllers
                 Title = data.Title
             };
 
-            return await _productService.CreateProduct(creationData);
+            return Ok(await _productService.CreateProduct(creationData));
         }
 
         /// <summary>
@@ -71,9 +70,9 @@ namespace PB_WebApi.Controllers
         /// <param name="id">Product id</param>   
         /// <returns>Updated product</returns>
 
-        [RequedRoleAuthorize(UserRoleType.Admin)]
+        [RequiredRoleAuthorize(UserRoleType.Admin)]
         [HttpPut("{id}"), Authorize]
-        public async Task<Product> UpdateProduct(
+        public async Task<IActionResult> UpdateProduct(
             string id,
             [FromBody] ProductUpdateModel data)
         {
@@ -86,7 +85,7 @@ namespace PB_WebApi.Controllers
                 Title = data.Title
             };
 
-            return await _productService.UpdateProduct(updatingData);
+            return Ok(await _productService.UpdateProduct(updatingData));
         }
 
         /// <summary>
@@ -94,13 +93,13 @@ namespace PB_WebApi.Controllers
         /// </summary>
         /// <param name="id">Product id</param>
 
-        [RequedRoleAuthorize(UserRoleType.Admin)]
+        [RequiredRoleAuthorize(UserRoleType.Admin)]
         [HttpDelete("{id}"), Authorize]
-        public async Task<IResult> Delete(string id)
+        public async Task<IActionResult> Delete(string id)
         {
             await _productService.RemoveProduct(id);
 
-            return Results.Ok();
+            return Ok("Product deleted");
         }
     }
 }

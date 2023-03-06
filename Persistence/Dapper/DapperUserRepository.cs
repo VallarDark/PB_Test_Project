@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
 using Contracts;
-using Domain.Agregates.UserAgregate;
+using Domain.Aggregates.UserAggregate;
 using Microsoft.FSharp.Core;
 using Persistence.Dapper.Context;
-using Persistence.EntityFramework;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;

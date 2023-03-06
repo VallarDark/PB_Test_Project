@@ -24,11 +24,11 @@ namespace Services.Extensions
             return default;
         }
 
-        public static T GetReadeableRepositoryOrDefault<T, Y>(
+        public static T GetReadableRepositoryOrDefault<T, Y>(
             this IEnumerable<T> repositories,
             RepositoryType repositoryType)
 
-            where T : IReadeableRepository<Y>, IResolvable
+            where T : IReadableRepository<Y>, IResolvable
             where Y : class, IEntity
         {
             foreach (var repository in repositories)

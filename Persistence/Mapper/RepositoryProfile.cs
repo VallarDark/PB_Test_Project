@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Domain.Agregates.ProductAgregate;
-using Domain.Agregates.UserAgregate;
+using Domain.Aggregates.ProductAggregate;
+using Domain.Aggregates.UserAggregate;
 using Persistence.Entities;
 
 namespace Persistence.Mapper

@@ -64,7 +64,7 @@ namespace Domain.Utils
         }
 
         public static string EnsureStringIsNotEmpty(
-            string data,
+            string? data,
             string errorMsg = DEFAULT_STRING_NOT_EMPTY_ERROR)
         {
             if (string.IsNullOrEmpty(data))
@@ -188,42 +188,42 @@ namespace Domain.Utils
             return default(Unit);
         }
 
-        public static int EnsureNomberIsNonNegative(
-            int nomber,
+        public static int EnsureNumberIsNonNegative(
+            int number,
             string errorMsg = DEFAULT_NOMBER_IS_NON_NEGATIVE_ERROR)
         {
-            if (nomber < 0)
+            if (number < 0)
             {
                 throw new ArgumentException(errorMsg);
             }
 
-            return nomber;
+            return number;
         }
 
         public static T EnsureNumberIsMoreOrEqualValue<T>(
-            T nomber,
+            T number,
             T value,
             string errorMsg = DEFAULT_NOMBER_IS_LESS_THEN_VALUE_ERROR) where T : IComparable
         {
-            if (nomber.CompareTo(value) < 0)
+            if (number.CompareTo(value) < 0)
             {
                 throw new ArgumentException(errorMsg);
             }
 
-            return nomber;
+            return number;
         }
 
         public static T EnsureNumberIsLessOrEqualValue<T>(
-            T nomber,
+            T number,
             T value,
             string errorMsg = DEFAULT_NOMBER_IS_MORE_THEN_VALUE_ERROR) where T : IComparable
         {
-            if (nomber.CompareTo(value) > 0)
+            if (number.CompareTo(value) > 0)
             {
                 throw new ArgumentException(errorMsg);
             }
 
-            return nomber;
+            return number;
         }
     }
 }

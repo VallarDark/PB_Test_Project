@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Contracts;
-using Domain.Agregates.ProductAgregate;
+using Domain.Aggregates.ProductAggregate;
 using Domain.Exceptions;
 using Domain.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -196,14 +196,14 @@ namespace Persistence.EntityFramework
                 newItemCategories,
                 out var needToRemove,
                 out var needToAdd,
-                out var neeedToUpdate))
+                out var needToUpdate))
             {
                 foreach (var itemToRemove in needToRemove)
                 {
                     existingItem.Categories.Remove(itemToRemove);
                 }
 
-                foreach (var itemToUpdate in neeedToUpdate)
+                foreach (var itemToUpdate in needToUpdate)
                 {
                     var existingItemMember = existingItem.Categories
                         .FirstOrDefault(m => m.Id == itemToUpdate.Id);

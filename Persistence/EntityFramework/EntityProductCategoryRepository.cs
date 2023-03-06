@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Contracts;
-using Domain.Agregates.ProductAgregate;
+using Domain.Aggregates.ProductAggregate;
 using Domain.Exceptions;
 using Domain.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -95,7 +95,7 @@ namespace Persistence.EntityFramework
             EnsuredUtils.EnsureNumberIsMoreOrEqualValue(pageNumber, 1);
             EnsuredUtils.EnsureNumberIsMoreOrEqualValue(itemsPerPage, 1);
 
-            IQueryable<ProductCategoryEntity> result = _Db.Categories; ;
+            IQueryable<ProductCategoryEntity> result = _Db.Categories;
 
             if (addInnerItems)
             {
@@ -128,7 +128,7 @@ namespace Persistence.EntityFramework
             Expression<Func<ProductCategory, bool>>? predicate = null,
             bool addInnerItems = false)
         {
-            IQueryable<ProductCategoryEntity> result = _Db.Categories; ;
+            IQueryable<ProductCategoryEntity> result = _Db.Categories;
 
             if (addInnerItems)
             {
@@ -197,14 +197,14 @@ namespace Persistence.EntityFramework
                 newItemProducts,
                 out var needToRemove,
                 out var needToAdd,
-                out var neeedToUpdate))
+                out var needToUpdate))
             {
                 foreach (var itemToRemove in needToRemove)
                 {
                     existingItem.Products.Remove(itemToRemove);
                 }
 
-                foreach (var itemToUpdate in neeedToUpdate)
+                foreach (var itemToUpdate in needToUpdate)
                 {
                     var existingItemMember = existingItem.Products
                         .FirstOrDefault(m => m.Id == itemToUpdate.Id);

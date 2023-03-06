@@ -2,7 +2,7 @@
 using Contracts;
 using Persistence.Dapper.Context;
 
-namespace Persistence.EntityFramework
+namespace Persistence.Dapper
 {
     public abstract class DapperRepositoryBase : RepositoryBase
     {

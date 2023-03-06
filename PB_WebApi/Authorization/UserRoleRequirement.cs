@@ -1,4 +1,4 @@
-﻿using Domain.Agregates.UserAgregate;
+﻿using Domain.Aggregates.UserAggregate;
 using Microsoft.AspNetCore.Authorization;
 
 namespace PB_WebApi.Authorization

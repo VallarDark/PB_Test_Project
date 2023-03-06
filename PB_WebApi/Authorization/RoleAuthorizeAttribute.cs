@@ -1,9 +1,9 @@
-﻿using Domain.Agregates.UserAgregate;
+﻿using Domain.Aggregates.UserAggregate;
 using Microsoft.AspNetCore.Authorization;
 
 namespace PB_WebApi.Authorization
 {
-    internal class RequedRoleAuthorizeAttribute : AuthorizeAttribute
+    internal class RequiredRoleAuthorizeAttribute : AuthorizeAttribute
     {
         const string POLICY_POSTFIX = "Role";
         private UserRoleType role;
@@ -21,12 +21,12 @@ namespace PB_WebApi.Authorization
             }
         }
 
-        public RequedRoleAuthorizeAttribute()
+        public RequiredRoleAuthorizeAttribute()
         {
             Role = UserRoleType.User;
         }
 
-        public RequedRoleAuthorizeAttribute(UserRoleType role)
+        public RequiredRoleAuthorizeAttribute(UserRoleType role)
         {
             Role = role;
         }

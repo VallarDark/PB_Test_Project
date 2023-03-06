@@ -1,10 +1,9 @@
 ﻿using Contracts;
-using Domain.Agregates.UserAgregate;
+using Domain.Aggregates.UserAggregate;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using PB_WebApi.Models;
-using PB_WebApi.Utils;
+using PresentationModels.Models;
 
 namespace PB_WebApi.Controllers
 {
@@ -18,15 +17,20 @@ namespace PB_WebApi.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IUserTokenProvider _tokenProvider;
 
         /// <summary>
         /// Initialization
         /// </summary>
         /// <param name="userService"> User service</param>
+        /// <param name="tokenProvider"> User token provider</param>
 
-        public AccountController(IUserService userService)
+        public AccountController(
+            IUserService userService,
+            IUserTokenProvider tokenProvider)
         {
             _userService = userService;
+            _tokenProvider = tokenProvider;
         }
 
         /// <summary>
@@ -37,7 +41,7 @@ namespace PB_WebApi.Controllers
 
         [HttpPost("registration")]
         [AllowAnonymous]
-        public async Task<IResult> Registration(UserRegistrationModel registrationModel)
+        public async Task<IActionResult> Registration(UserRegistrationModel registrationModel)
         {
             var userRegistrationDto = new UserRegistrationDto()
             {
@@ -48,16 +52,15 @@ namespace PB_WebApi.Controllers
                 Password = registrationModel.Password
             };
 
-            try
-            {
-                var result = await _userService.RegisterCasualUser(userRegistrationDto);
+            var result = await _userService.RegisterCasualUser(userRegistrationDto);
 
-                return Results.Ok(result);
-            }
-            catch (Exception ex)
+            var userInfo = new UserInfoDto
             {
-                return ex.Handle();
-            }
+                TokenDto = result,
+                UserName = _userService.CurrentUser?.NickName
+            };
+
+            return Ok(userInfo);
         }
 
         /// <summary>
@@ -68,7 +71,7 @@ namespace PB_WebApi.Controllers
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<IResult> Login(UserLoginModel loginModel)
+        public async Task<IActionResult> Login(UserLoginModel loginModel)
         {
             var userLoginDto = new UserLoginDto()
             {
@@ -76,16 +79,34 @@ namespace PB_WebApi.Controllers
                 Password = loginModel.Password
             };
 
-            try
-            {
-                var result = await _userService.LoginUser(userLoginDto);
+            var result = await _userService.LoginUser(userLoginDto);
 
-                return Results.Ok(result);
-            }
-            catch (Exception ex)
+            var userInfo = new UserInfoDto
             {
-                return ex.Handle();
-            }
+                TokenDto = result,
+                UserName = _userService.CurrentUser?.NickName
+            };
+
+            return Ok(userInfo);
+        }
+
+        /// <summary>
+        /// Login
+        /// </summary>
+        /// <param name="tokenData"> Refresh token + JWT</param>
+        /// <returns>HTTP success status | HTTP error</returns>
+
+        [HttpPost("refreshToken")]
+        [AllowAnonymous]
+        public IActionResult RefreshToken([FromBody] RefreshTokenModel tokenData)
+        {
+            var tokenDto = new TokenDto
+            {
+                Token = tokenData.Token,
+                RefreshToken = tokenData.RefreshToken
+            };
+
+            return Ok(_tokenProvider.RefreshToken(tokenDto));
         }
 
         /// <summary>
@@ -95,11 +116,11 @@ namespace PB_WebApi.Controllers
 
         [HttpPost("logout")]
         [Authorize]
-        public async Task<IResult> LogOut()
+        public async Task<IActionResult> LogOut()
         {
             await _userService.LogOut();
 
-            return Results.Ok("Logged out");
+            return Ok("Logged out");
         }
 
         /// <summary>
@@ -109,11 +130,12 @@ namespace PB_WebApi.Controllers
 
         [HttpPost("changeRepository")]
         [Authorize]
-        public async Task<IResult> ChangeRepository([FromBody] RepositoryType repositoryType)
+        public async Task<IActionResult> ChangeRepository([FromBody] RepositoryType repositoryType)
         {
+
             await _userService.ChangeRepositoryType(repositoryType);
 
-            return Results.Ok("Repository changed");
+            return Ok("Repository changed");
         }
     }
 }

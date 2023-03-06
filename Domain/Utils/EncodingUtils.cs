@@ -9,6 +9,8 @@ namespace Domain.Utils
 
         public static Encoding DataEncoding => dataEncoding;
 
+        public static Encoding AltDataEncoding => Encoding.ASCII;
+
         public static string EncodeData(string? data)
         {
             if (string.IsNullOrEmpty(data))

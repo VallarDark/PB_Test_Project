@@ -1,7 +1,7 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Contracts;
-using Domain.Agregates.ProductAgregate;
-using Domain.Agregates.UserAgregate;
+using Domain.Aggregates.ProductAggregate;
+using Domain.Aggregates.UserAggregate;
 using Domain.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -10,8 +10,8 @@ using PB_WebApi.Authorization;
 using Persistence.Dapper.Context;
 using Persistence.EntityFramework.Context;
 using Services;
-using Services.ProductAgregate;
-using Services.UserAgregate;
+using Services.ProductAggregate;
+using Services.UserAggregate;
 using Services.Utils;
 using System.Reflection;
 
@@ -60,17 +60,17 @@ namespace PB_WebApi.Utils
         {
             var assembly = Assembly.Load(nameof(Persistence));
 
-            var allAsssemblyTypes = assembly.GetTypes();
+            var allAssemblyTypes = assembly.GetTypes();
 
             services.AddAutoMapper(cfg => cfg.AddExpressionMapping(), assembly);
 
             services.AddDbContext<PbDbContext>();
             services.AddSingleton<DapperContext>();
 
-            services.AddTransient<IUserRepository>(allAsssemblyTypes);
-            services.AddTransient<IUserRoleRepository>(allAsssemblyTypes);
-            services.AddTransient<IProductRepository>(allAsssemblyTypes);
-            services.AddTransient<IProductCategoryRepository>(allAsssemblyTypes);
+            services.AddTransient<IUserRepository>(allAssemblyTypes);
+            services.AddTransient<IUserRoleRepository>(allAssemblyTypes);
+            services.AddTransient<IProductRepository>(allAssemblyTypes);
+            services.AddTransient<IProductCategoryRepository>(allAssemblyTypes);
 
             return services;
         }
@@ -105,7 +105,7 @@ namespace PB_WebApi.Utils
                     ValidIssuer = configuration["JWT:Issuer"],
                     ValidAudience = configuration["JWT:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey
-                    (EncodingUtils.DataEncoding.GetBytes(configuration["JWT:Key"] ?? string.Empty)),
+                    (EncodingUtils.AltDataEncoding.GetBytes(configuration["JWT:Key"] ?? string.Empty)),
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,

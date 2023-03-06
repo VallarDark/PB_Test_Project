@@ -1,7 +1,7 @@
 ﻿namespace Contracts
 {
     public interface IRepository<T> :
-        IReadeableRepository<T>,
+        IReadableRepository<T>,
         IWriteableRepository<T>,
         IRemoveableRepository<T>
 

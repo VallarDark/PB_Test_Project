@@ -1,11 +1,10 @@
-﻿using Contracts;
-using Domain.Agregates.ProductAgregate;
-using Domain.Agregates.UserAgregate;
+﻿using Domain.Aggregates.ProductAggregate;
+using Domain.Aggregates.UserAggregate;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using PB_WebApi.Authorization;
-using PB_WebApi.Models;
+using PresentationModels.Models;
 
 namespace PB_WebApi.Controllers
 {
@@ -38,10 +37,10 @@ namespace PB_WebApi.Controllers
         /// <returns>Paginated collection of categories</returns>
 
         [HttpGet("page/{pageNumber}"), Authorize]
-        public async Task<PaginatedCollectionBase<ProductCategory>> GetCategories(
+        public async Task<IActionResult> GetCategories(
             int pageNumber)
         {
-            return await _productService.GetProductCategories(pageNumber);
+            return Ok(await _productService.GetProductCategories(pageNumber));
         }
 
         /// <summary>
@@ -50,9 +49,9 @@ namespace PB_WebApi.Controllers
         /// <param name="data">Category creation data</param>   
         /// <returns>New category</returns>
 
-        [RequedRoleAuthorize(UserRoleType.Admin)]
+        [RequiredRoleAuthorize(UserRoleType.Admin)]
         [HttpPost, Authorize]
-        public async Task<ProductCategory> CreateCategory(
+        public async Task<IActionResult> CreateCategory(
             [FromBody] ProductCategoryCreationModel data)
         {
             var creationData = new ProductCategoryChangeDto()
@@ -61,7 +60,7 @@ namespace PB_WebApi.Controllers
                 Name = data.Name
             };
 
-            return await _productService.CreateCategory(creationData);
+            return Ok(await _productService.CreateCategory(creationData));
         }
 
         /// <summary>
@@ -71,9 +70,9 @@ namespace PB_WebApi.Controllers
         /// <param name="id">Category id</param>   
         /// <returns>Updated category</returns>
 
-        [RequedRoleAuthorize(UserRoleType.Admin)]
+        [RequiredRoleAuthorize(UserRoleType.Admin)]
         [HttpPut("{id}"), Authorize]
-        public async Task<ProductCategory> UpdateCategory(
+        public async Task<IActionResult> UpdateCategory(
             string id,
             [FromBody] ProductCategoryUpdateModel data)
         {
@@ -84,7 +83,7 @@ namespace PB_WebApi.Controllers
                 Name = data.Name
             };
 
-            return await _productService.UpdateCategory(updatingData);
+            return Ok(await _productService.UpdateCategory(updatingData));
         }
 
         /// <summary>
@@ -93,13 +92,13 @@ namespace PB_WebApi.Controllers
         /// <param name="id">Category id</param>
         /// <returns>HTTP OK</returns>
 
-        [RequedRoleAuthorize(UserRoleType.Admin)]
+        [RequiredRoleAuthorize(UserRoleType.Admin)]
         [HttpDelete("{id}"), Authorize]
-        public async Task<IResult> Delete(string id)
+        public async Task<IActionResult> Delete(string id)
         {
             await _productService.RemoveCategory(id);
 
-            return Results.Ok();
+            return Ok("Category deleted");
         }
 
         /// <summary>
@@ -109,15 +108,15 @@ namespace PB_WebApi.Controllers
         /// <param name="productId">ProductId id</param>   
         /// <returns>HTTP OK</returns>
 
-        [RequedRoleAuthorize(UserRoleType.Admin)]
+        [RequiredRoleAuthorize(UserRoleType.Admin)]
         [HttpPost("{categoryId}/addProduct"), Authorize]
-        public async Task<IResult> AddProductToCategory(
+        public async Task<IActionResult> AddProductToCategory(
             string categoryId,
             [FromBody] string productId)
         {
             await _productService.AddProductToCategory(productId, categoryId);
 
-            return Results.Ok();
+            return Ok($"Product {productId} added to category {categoryId}");
         }
 
         /// <summary>
@@ -127,15 +126,15 @@ namespace PB_WebApi.Controllers
         /// <param name="productId">ProductId id</param>   
         /// <returns>HTTP OK</returns>
 
-        [RequedRoleAuthorize(UserRoleType.Admin)]
+        [RequiredRoleAuthorize(UserRoleType.Admin)]
         [HttpPost("{categoryId}/removeProduct"), Authorize]
-        public async Task<IResult> RemoveProductFromCategory(
+        public async Task<IActionResult> RemoveProductFromCategory(
             string categoryId,
             [FromBody] string productId)
         {
             await _productService.RemoveProductFromCategory(productId, categoryId);
 
-            return Results.Ok();
+            return Ok($"Product {productId} removed from category {categoryId}");
         }
     }
 }

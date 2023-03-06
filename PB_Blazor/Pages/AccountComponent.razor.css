@@ -1,0 +1,14 @@
+﻿.form-link {
+    color: rgb(0, 60, 255);
+}
+
+    .form-link:hover {
+        color: rgb(0, 135, 255);
+        cursor: pointer;
+    }
+
+.form-header {
+    background-color: rgb(0, 100, 255);
+    color: rgb(255, 255, 255);
+    border-radius: 5px;
+}

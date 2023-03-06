@@ -1,10 +1,8 @@
-﻿using Domain.Agregates.UserAgregate;
-using Domain.Utils;
+﻿using Domain.Aggregates.UserAggregate;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
 using System.Text.Encodings.Web;
 
 namespace PB_WebApi.Authorization
@@ -70,61 +68,32 @@ namespace PB_WebApi.Authorization
                 {
                     if (validator.CanReadToken(token))
                     {
-                        ClaimsPrincipal? principal = null;
+                        ClaimsData? claimData = null;
 
                         try
                         {
-                            principal = _tokenProvider.ReadToken(
+                            claimData = _tokenProvider.ReadToken(
                                token,
                                Options.TokenValidationParameters,
                                out validatedToken);
 
-                            if (principal == null)
+                            if (claimData == null)
                             {
                                 continue;
                             }
 
-                            var email = principal.Claims.FirstOrDefault(c =>
-                                c.Type == ClaimType.Email.ToString())?.Value;
+                            var decryptedClaimData = claimData.DecryptData();
 
-                            var name = principal.Claims.FirstOrDefault(c =>
-                                c.Type == ClaimType.Name.ToString())?.Value;
-
-                            var lastName = principal.Claims.FirstOrDefault(c =>
-                                c.Type == ClaimType.LastName.ToString())?.Value;
-
-                            var sid = principal.Claims.FirstOrDefault(c =>
-                                c.Type == ClaimType.Sid.ToString())?.Value;
-
-                            var role = principal.Claims.FirstOrDefault(c =>
-                                c.Type == ClaimType.Role.ToString())?.Value;
-
-                            var passworHash = principal.Claims.FirstOrDefault(c =>
-                                c.Type == ClaimType.PasswordHash.ToString())?.Value;
-
-                            if (string.IsNullOrEmpty(email)
-                                || string.IsNullOrEmpty(name)
-                                || string.IsNullOrEmpty(lastName)
-                                || string.IsNullOrEmpty(sid)
-                                || string.IsNullOrEmpty(role)
-                                || string.IsNullOrEmpty(passworHash))
-                            {
-                                continue;
-                            }
-
-                            if (Enum.TryParse<UserRoleType>(
-                                    EncodingUtils.DecodeData(role),
-                                    true,
-                                    out var roleType))
+                            if (Enum.TryParse<UserRoleType>(decryptedClaimData.RoleType, true, out var roleType))
                             {
                                 var personalData = new UserValidationDto()
                                 {
-                                    Email = EncodingUtils.DecodeData(email),
-                                    Name = EncodingUtils.DecodeData(name),
-                                    LastName = EncodingUtils.DecodeData(lastName),
-                                    SessionToken = EncodingUtils.DecodeData(sid),
+                                    Email = decryptedClaimData.Email,
+                                    Name = decryptedClaimData.Name,
+                                    LastName = decryptedClaimData.LastName,
+                                    SessionToken = decryptedClaimData.SessionToken,
                                     Role = roleType,
-                                    PasswordHash = passworHash
+                                    PasswordHash = decryptedClaimData.Password
                                 };
 
                                 result = await _userService.VerifyUser(personalData);
@@ -162,7 +131,7 @@ namespace PB_WebApi.Authorization
                                 Scheme,
                                 Options)
                             {
-                                Principal = principal,
+                                Principal = claimData?.Principal,
                                 SecurityToken = validatedToken
                             };
 

@@ -1,0 +1,26 @@
+﻿@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+@using PB_Blazor.Services;
+
+@inject UserManager _userManager
+@inject ProtectedLocalStorage _storage
+@inject NavigationManager _navigationManager
+
+<div>
+    @if (_userManager.IsAuthorized)
+    {
+        <div class="nav-panel">
+            <div class="sign-name">
+                <em>Hello, @_userManager.UserInfo?.UserName</em>
+            </div>
+            <div @onclick="LogOut" class="sign-link sign-out">
+                <em>Sing Out</em>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div @onclick="GoToAccount" class=" sign-link sign-in">
+            <em>Sing In</em>
+        </div>      
+    }
+</div>

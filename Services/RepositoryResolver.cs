@@ -15,13 +15,13 @@ namespace Services
             _serviceProvider = EnsuredUtils.EnsureNotNull(serviceProvider);
         }
 
-        public IReadeableRepository<Y>? GetReadeableRepository<T, Y>(
+        public IReadableRepository<Y>? GetReadableRepository<T, Y>(
             RepositoryType repositoryType)
-            where T : class, IReadeableRepository<Y>, IResolvable
+            where T : class, IReadableRepository<Y>, IResolvable
             where Y : class, IEntity
         {
             return _serviceProvider.GetServices<T>()
-                .GetReadeableRepositoryOrDefault<T, Y>(repositoryType);
+                .GetReadableRepositoryOrDefault<T, Y>(repositoryType);
         }
 
         public IRemoveableRepository<Y>? GetRemoveableRepository<T, Y>(

@@ -1,3 +1,4 @@
+using PB_WebApi.ErrorHandler;
 using PB_WebApi.Utils;
 using System.Net;
 
@@ -14,6 +15,8 @@ builder.Services.AddRepositories();
 builder.Services.AddServices();
 builder.Services.AddControllers();
 builder.Services.AddConfiguredCors();
+builder.Services.AddScoped<ExceptionMiddleware>();
+builder.Services.AddLogging();
 
 builder.Services.AddHsts(options =>
 {
@@ -37,6 +40,8 @@ builder.Logging.AddJsonConsole();
 var app = builder.Build();
 
 #region PiplineSetup
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {

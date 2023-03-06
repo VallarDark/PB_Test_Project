@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Contracts;
-using Domain.Agregates.UserAgregate;
+using Domain.Aggregates.UserAggregate;
 using Domain.Exceptions;
 using Domain.Utils;
 using Microsoft.EntityFrameworkCore;
