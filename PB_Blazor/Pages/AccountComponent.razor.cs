@@ -1,4 +1,5 @@
-﻿using PresentationModels.Models;
+﻿using Contracts;
+using PresentationModels.Models;
 
 namespace PB_Blazor.Pages
 {
@@ -7,9 +8,9 @@ namespace PB_Blazor.Pages
         private UserLoginModel userLogin;
         private UserRegistrationModel userRegistration;
 
+        private RepositoryType repositoryType;
         private bool isRegistrationForm;
         private string? error;
-        private string? returnUrl;
 
         public AccountComponent()
         {
@@ -18,25 +19,13 @@ namespace PB_Blazor.Pages
             userRegistration = new UserRegistrationModel();
         }
 
-        private async Task OnLoginAsync()
+        private async Task Login()
         {
             try
             {
-                var result = await _userManager.LogIn(userLogin);
+                error = null;
 
-                if (result != null)
-                {
-                    await _storage.SetAsync(nameof(UserInfoDto), result);
-                }
-
-                returnUrl = (await _storage.GetAsync<string>(nameof(returnUrl))).Value;
-
-                if (returnUrl != null)
-                {
-                    await _storage.SetAsync(nameof(returnUrl), null);
-
-                    _navigationManager.NavigateTo(returnUrl, true);
-                }
+                await _userManager.LogIn(userLogin);
             }
             catch (Exception ex)
             {
@@ -48,16 +37,13 @@ namespace PB_Blazor.Pages
             }
         }
 
-        private async Task OnRegistrationAsync()
+        private async Task Registration()
         {
             try
             {
-                var result = await _userManager.Registration(userRegistration);
+                error = null;
 
-                if (result != null)
-                {
-                    await _storage.SetAsync(nameof(UserInfoDto), result);
-                }
+                await _userManager.Registration(userRegistration);
             }
             catch (Exception ex)
             {
@@ -71,24 +57,44 @@ namespace PB_Blazor.Pages
 
         private void ChangeForm()
         {
+            error = null;
+
             isRegistrationForm = !isRegistrationForm;
             StateHasChanged();
         }
 
         private async Task LogOut()
         {
-            await _storage.SetAsync(nameof(UserInfoDto), null);
+            error = null;
             _userManager.LogOut();
+        }
+
+        private async Task SaveChanges()
+        {
+            try
+            {
+                error = null;
+
+                await _userManager.ChangeRepositoryType(repositoryType);
+            }
+            catch (Exception ex)
+            {
+                error = ex.Message;
+            }
+            finally
+            {
+                StateHasChanged();
+            }
         }
 
         protected override void OnInitialized()
         {
-            _userManager.OnChanged += StateHasChanged;
+            _userManager.OnUserInfoChanged += StateHasChanged;
         }
 
         public void Dispose()
         {
-            _userManager.OnChanged -= StateHasChanged;
+            _userManager.OnUserInfoChanged -= StateHasChanged;
         }
     }
 }

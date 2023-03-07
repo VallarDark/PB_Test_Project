@@ -5,13 +5,14 @@ namespace PB_Blazor.Components
     public partial class SignInComponent
     {
         private bool isAuthorized;
+        private string? returnUrl;
 
         public SignInComponent()
         {
             isAuthorized = false;
         }
 
-        private async Task LogOut()
+        private async void LogOut()
         {
             await _storage.SetAsync(nameof(UserInfoDto), null);
             _userManager.LogOut();
@@ -33,14 +34,42 @@ namespace PB_Blazor.Components
             _navigationManager.NavigateTo($"/account");
         }
 
+        private async void UpdateLocaleUserInfo()
+        {
+            await _storage.SetAsync(nameof(UserInfoDto), _userManager.UserInfo);
+        }
+
+        private async void NavigateToReturnUrl()
+        {
+            returnUrl = (await _storage.GetAsync<string>(nameof(returnUrl))).Value;
+
+            if (returnUrl != null)
+            {
+                await _storage.SetAsync(nameof(returnUrl), null);
+
+                _navigationManager.NavigateTo(returnUrl, true);
+            }
+        }
+
+        private async void SaveReturnUrl(string? returnUrl)
+        {
+            await _storage.SetAsync(nameof(returnUrl), returnUrl);
+        }
+
         protected override void OnInitialized()
         {
-            _userManager.OnChanged += StateHasChanged;
+            _userManager.OnUserInfoChanged += StateHasChanged;
+            _userManager.OnUserInfoChanged += UpdateLocaleUserInfo;
+            _userManager.OnLogin += NavigateToReturnUrl;
+            _userManager.OnRefreshTokenExpired += SaveReturnUrl;
         }
 
         public void Dispose()
         {
-            _userManager.OnChanged -= StateHasChanged;
+            _userManager.OnUserInfoChanged -= StateHasChanged;
+            _userManager.OnUserInfoChanged -= UpdateLocaleUserInfo;
+            _userManager.OnLogin -= NavigateToReturnUrl;
+            _userManager.OnRefreshTokenExpired -= SaveReturnUrl;
         }
     }
 }

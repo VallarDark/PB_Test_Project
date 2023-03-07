@@ -42,7 +42,7 @@ namespace Services.UserAggregate
         {
             EnsuredUtils.EnsureNotNull(currentUser, DEFAULT_UNAUTHORISED_ERROR);
 
-            return currentUser.Role.CompareTo(permission) >= 0;
+            return currentUser.DoesHavePermission(permission);
         }
 
         public UserService(
@@ -134,7 +134,7 @@ namespace Services.UserAggregate
         {
             if (!DoesUserHavePermission(UserRoleType.Admin))
             {
-                throw new LowPrevilegesLevelException(DEFAULT_LOW_PREVILEGIES_LEVEL_ERROR);
+                throw new LowPrivilegesLevelException(DEFAULT_LOW_PREVILEGIES_LEVEL_ERROR);
             }
 
             EnsuredUtils.EnsureNotNull(

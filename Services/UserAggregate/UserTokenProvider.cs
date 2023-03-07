@@ -12,7 +12,9 @@ namespace Services.UserAggregate
     public class UserTokenProvider : IUserTokenProvider
     {
         private const string INVALIDE_TOKEN_EXCEPTION = "Token is invalid";
+        private const string TOKEN_EXPIRED_EXCEPTION = "Token has been expired";
         private const string INVALIDE_USER_DATA_EXCEPTION = "Invalid user data";
+
         private const int TOKEN_LIFE_TIME_MINUTES = 5;
         private const int REFRESH_TOKEN_LIFE_TIME_MINUTES = 60;
 
@@ -58,7 +60,19 @@ namespace Services.UserAggregate
                 throw new InvalidTokenException(INVALIDE_TOKEN_EXCEPTION);
             }
 
-            var claims = tokenHandler.ValidateToken(token, parameters, out securityToken);
+            ClaimsPrincipal claims;
+            try
+            {
+                claims = tokenHandler.ValidateToken(token, parameters, out securityToken);
+            }
+            catch (SecurityTokenExpiredException)
+            {
+                throw new TokenExpiredException(TOKEN_EXPIRED_EXCEPTION);
+            }
+            catch
+            {
+                throw new InvalidTokenException(INVALIDE_TOKEN_EXCEPTION);
+            }
 
             return new ClaimsData(claims);
         }
@@ -83,26 +97,25 @@ namespace Services.UserAggregate
                 throw new InvalidTokenException(INVALIDE_TOKEN_EXCEPTION);
             }
 
-            var claims = tokenHandler.ValidateToken(
-                tokenData.Token,
-                validationParameters,
-                out var _);
+            ClaimsPrincipal claims;
+
+            try
+            {
+                claims = tokenHandler.ValidateToken(
+                    tokenData.Token,
+                    validationParameters,
+                    out var _);
+            }
+            catch (Exception)
+            {
+                throw new InvalidTokenException(INVALIDE_TOKEN_EXCEPTION);
+            }
 
             var claimsData = new ClaimsData(claims);
 
             EnsuredUtils.EnsureNotNull(claimsData);
 
-            try
-            {
-                if (!ClaimsData.IsRefreshTokenValid(tokenData.RefreshToken, claimsData))
-                {
-                    throw new InvalidTokenException(INVALIDE_TOKEN_EXCEPTION);
-                }
-            }
-            catch
-            {
-                throw new InvalidTokenException(INVALIDE_TOKEN_EXCEPTION);
-            }
+            ClaimsData.ValidateRefreshToken(tokenData.RefreshToken, claimsData);
 
             return new TokenDto
             {

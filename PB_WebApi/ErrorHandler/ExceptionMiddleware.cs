@@ -25,13 +25,24 @@ namespace PB_WebApi.ErrorHandler
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
+            if (ex is LowPrivilegesLevelException)
+            {
+                context.Response.Headers.Add("Low-Privileges-Level", "true");
+            }
+
+            if (ex is TokenExpiredException)
+            {
+                context.Response.Headers.Add("Token-Expired", "true");
+            }
+
             if (ex is EmptyCollectionException
                     || ex is InvalidLoginDataException
                     || ex is InvalidTokenException
                     || ex is ItemAlreadyExistsException
                     || ex is ItemNotExistsException
-                    || ex is LowPrevilegesLevelException
+                    || ex is LowPrivilegesLevelException
                     || ex is NullValueException
+                    || ex is TokenExpiredException
                     || ex is WrongCollectionItemsCountException
                     || ex is WrongOperationException
                     || ex is ArgumentException)

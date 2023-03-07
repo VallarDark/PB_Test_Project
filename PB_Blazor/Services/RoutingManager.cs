@@ -63,6 +63,10 @@ namespace PB_Blazor.Services
                     "{0}/api/Account/logout"
                 },
                 {
+                    Endpoint.ChangeRepository.ToString(),
+                    "{0}/api/Account/changeRepository"
+                },
+                {
                     Endpoint.GetCategories.ToString(),
                     "{0}/api/Categories/page/{1}"
                 },

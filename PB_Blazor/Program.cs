@@ -10,6 +10,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddBlazorBootstrap();
 builder.Services.AddScoped<UserManager>();
+builder.Services.AddScoped<ProductsManager>();
 builder.Services.AddSingleton<RequestSender>();
 builder.Services.AddSingleton<RoutingManager>();
 builder.Services.Configure<CookiePolicyOptions>(options =>

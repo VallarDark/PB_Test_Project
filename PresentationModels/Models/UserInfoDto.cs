@@ -1,4 +1,5 @@
-﻿using Domain.Aggregates.UserAggregate;
+﻿using Contracts;
+using Domain.Aggregates.UserAggregate;
 
 namespace PresentationModels.Models
 {
@@ -7,5 +8,9 @@ namespace PresentationModels.Models
         public TokenDto? TokenDto { get; set; }
 
         public string? UserName { get; set; }
+
+        public UserRoleType? UserRole { get; set; }
+
+        public RepositoryType? RepositoryType { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Domain.Utils;
+﻿using Domain.Exceptions;
+using Domain.Utils;
 using Newtonsoft.Json;
 using PB_Blazor.Errors;
 using PresentationModels.Models;
@@ -11,6 +12,15 @@ namespace PB_Blazor.Services
     {
         private const string BAD_REQUEST_DATA =
             "Bad request data";
+
+        private const string TOKEN_EXPIRED_EXCEPTION =
+            "Token has been expired";
+
+        private const string UNAUTHORIZED_EXCEPTION =
+            "You should be authorized to access resource";
+
+        private const string LOW_PREVILEGIES_LEVEL_EXCEPTION =
+            "You have too low privileges level";
 
         private const string URL_PATTERN =
             @"(www|http:|https:)+[^\s]+[\w]";
@@ -68,6 +78,21 @@ namespace PB_Blazor.Services
 
             if (!response.IsSuccessStatusCode)
             {
+                if (response.Headers.Any(h => h.Key == "Token-Expired"))
+                {
+                    throw new TokenExpiredException(TOKEN_EXPIRED_EXCEPTION);
+                }
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    throw new UnauthorizedAccessException(UNAUTHORIZED_EXCEPTION);
+                }
+
+                if (response.Headers.Any(h => h.Key == "Low-Privileges-Level"))
+                {
+                    throw new LowPrivilegesLevelException(LOW_PREVILEGIES_LEVEL_EXCEPTION);
+                }
+
                 var error = JsonConvert.DeserializeObject<ErrorDetails>(content);
 
                 throw new Exception(error?.Message ?? "Something gone wrong");

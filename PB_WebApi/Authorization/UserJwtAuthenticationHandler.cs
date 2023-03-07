@@ -1,4 +1,5 @@
 ﻿using Domain.Aggregates.UserAggregate;
+using Domain.Exceptions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
@@ -99,7 +100,7 @@ namespace PB_WebApi.Authorization
                                 result = await _userService.VerifyUser(personalData);
                             }
                         }
-                        catch (SecurityTokenExpiredException)
+                        catch (TokenExpiredException)
                         {
                             Context.Response.Headers.Add("Token-Expired", "true");
                         }

@@ -46,7 +46,7 @@ namespace Services.ProductAggregate
         {
             if (!_userService.DoesUserHavePermission(UserRoleType.Admin))
             {
-                throw new LowPrevilegesLevelException(DEFAULT_LOW_PREVILEGIES_LEVEL_ERROR);
+                throw new LowPrivilegesLevelException(DEFAULT_LOW_PREVILEGIES_LEVEL_ERROR);
             }
 
             EnsuredUtils.EnsureNotNull(
@@ -73,7 +73,7 @@ namespace Services.ProductAggregate
         {
             if (!_userService.DoesUserHavePermission(UserRoleType.Admin))
             {
-                throw new LowPrevilegesLevelException(DEFAULT_LOW_PREVILEGIES_LEVEL_ERROR);
+                throw new LowPrivilegesLevelException(DEFAULT_LOW_PREVILEGIES_LEVEL_ERROR);
             }
 
             EnsuredUtils.EnsureNotNull(
@@ -129,7 +129,7 @@ namespace Services.ProductAggregate
         {
             if (!_userService.DoesUserHavePermission(UserRoleType.Admin))
             {
-                throw new LowPrevilegesLevelException(DEFAULT_LOW_PREVILEGIES_LEVEL_ERROR);
+                throw new LowPrivilegesLevelException(DEFAULT_LOW_PREVILEGIES_LEVEL_ERROR);
             }
 
             EnsuredUtils.EnsureNotNull(
@@ -145,7 +145,7 @@ namespace Services.ProductAggregate
         {
             if (!_userService.DoesUserHavePermission(UserRoleType.Admin))
             {
-                throw new LowPrevilegesLevelException(DEFAULT_LOW_PREVILEGIES_LEVEL_ERROR);
+                throw new LowPrivilegesLevelException(DEFAULT_LOW_PREVILEGIES_LEVEL_ERROR);
             }
 
             EnsuredUtils.EnsureNotNull(
@@ -161,7 +161,7 @@ namespace Services.ProductAggregate
         {
             if (!_userService.DoesUserHavePermission(UserRoleType.Admin))
             {
-                throw new LowPrevilegesLevelException(DEFAULT_LOW_PREVILEGIES_LEVEL_ERROR);
+                throw new LowPrivilegesLevelException(DEFAULT_LOW_PREVILEGIES_LEVEL_ERROR);
             }
 
             EnsuredUtils.EnsureNotNull(
@@ -198,7 +198,7 @@ namespace Services.ProductAggregate
         {
             if (!_userService.DoesUserHavePermission(UserRoleType.Admin))
             {
-                throw new LowPrevilegesLevelException(DEFAULT_LOW_PREVILEGIES_LEVEL_ERROR);
+                throw new LowPrivilegesLevelException(DEFAULT_LOW_PREVILEGIES_LEVEL_ERROR);
             }
 
             EnsuredUtils.EnsureNotNull(
@@ -275,7 +275,7 @@ namespace Services.ProductAggregate
         {
             if (!_userService.DoesUserHavePermission(UserRoleType.Admin))
             {
-                throw new LowPrevilegesLevelException(DEFAULT_LOW_PREVILEGIES_LEVEL_ERROR);
+                throw new LowPrivilegesLevelException(DEFAULT_LOW_PREVILEGIES_LEVEL_ERROR);
             }
 
             EnsuredUtils.EnsureStringIsNotEmpty(productId);

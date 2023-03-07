@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Domain.Aggregates.UserAggregate;
+using System.ComponentModel.DataAnnotations;
 
 namespace PresentationModels.Models
 {
@@ -10,18 +11,22 @@ namespace PresentationModels.Models
 
         [Required]
         [DataType(DataType.Text)]
+        [MinLength(User.PASSWORD_MIN_LENGHT)]
         public string Name { get; set; }
 
         [Required]
         [DataType(DataType.Text)]
+        [MinLength(User.PASSWORD_MIN_LENGHT)]
         public string LastName { get; set; }
 
         [Required]
         [DataType(DataType.Text)]
+        [MinLength(User.PASSWORD_MIN_LENGHT)]
         public string NickName { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
+        [MinLength(User.PASSWORD_MIN_LENGHT)]
         public string Password { get; set; }
 
         [Required]

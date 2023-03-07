@@ -1,0 +1,31 @@
+﻿@page "/products"
+@using BlazorBootstrap
+@using Contracts;
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+@using PB_Blazor.Services;
+
+@inject UserManager _userManager
+@inject ProductsManager _productsManager
+@inject ProtectedLocalStorage _storage
+@inject NavigationManager _navigationManager
+
+@if (_userManager.IsAuthorized)
+{      
+    <div class="container">
+
+        <PageTitle>Products</PageTitle>
+
+        <h1>Products</h1>
+        <hr class="mb-5">
+
+        @if (products?.Items != null)
+        {
+            @foreach (var item in products.Items)
+            {
+                <em>@item.Title</em>
+                <hr class="mb-5">
+            }
+        }
+
+    </div>
+}

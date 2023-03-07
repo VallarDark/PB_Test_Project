@@ -15,5 +15,15 @@
         {
             collapseNavMenu = !collapseNavMenu;
         }
+
+        protected override void OnInitialized()
+        {
+            _userManager.OnUserInfoChanged += StateHasChanged;
+        }
+
+        public void Dispose()
+        {
+            _userManager.OnUserInfoChanged -= StateHasChanged;
+        }
     }
 }

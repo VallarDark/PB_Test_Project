@@ -1,4 +1,5 @@
-﻿@inject IJSRuntime _jsRuntime
+﻿@using PB_Blazor.Services;
+@inject UserManager _userManager
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -12,9 +13,19 @@
 <div class="@NavMenuCssClass">
     <nav @onclick="ToggleNavMenu" class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="account" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="false"></span> My_Account
+            <NavLink class="nav-link" href="account">
+                <span class="oi oi-home" aria-hidden="true"></span> My_Account
             </NavLink>
         </div>
+
+        @if (_userManager.IsAuthorized)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="products">
+                    <span class="oi oi-cart" aria-hidden="true"></span> Products
+                </NavLink>
+            </div>
+        }
+        
     </nav>
 </div>

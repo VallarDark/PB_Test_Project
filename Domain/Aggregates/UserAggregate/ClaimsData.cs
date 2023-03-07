@@ -1,4 +1,5 @@
-﻿using Domain.Utils;
+﻿using Domain.Exceptions;
+using Domain.Utils;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -10,6 +11,9 @@ namespace Domain.Aggregates.UserAggregate
     public class ClaimsData
     {
         private const string TOKEN_SEPARATOR = "|_|_|";
+        private const string INVALIDE_TOKEN_EXCEPTION = "Refresh token is invalid";
+        private const string INVALIDE_REFRESH_TOKEN_EXCEPTION = "Refresh token is invalid";
+        private const string TOKEN_EXPIRED_EXCEPTION = "Refresh token has been expired";
 
         private bool isEncrypted;
 
@@ -164,19 +168,43 @@ namespace Domain.Aggregates.UserAggregate
             return stringBuilder.ToString();
         }
 
-        public static bool IsRefreshTokenValid(string refreshToken, ClaimsData claims)
+        public static Guid ValidateRefreshToken(string refreshToken, ClaimsData? claims)
         {
-            var validTermPosition = refreshToken.IndexOf(TOKEN_SEPARATOR) + TOKEN_SEPARATOR.Length;
+            if (claims == null)
+            {
+                throw new InvalidTokenException(INVALIDE_TOKEN_EXCEPTION);
+            }
 
-            var validTermString = refreshToken.Substring(validTermPosition);
+            DateTime validTerm = DateTime.MinValue;
 
-            var decodedValidTermString = EncodingUtils.DecodeData(validTermString);
+            try
+            {
+                var validTermPosition = refreshToken.IndexOf(TOKEN_SEPARATOR) + TOKEN_SEPARATOR.Length;
 
-            var validTerm = DateTime.Parse(decodedValidTermString);
+                var validTermString = refreshToken.Substring(validTermPosition);
+
+                var decodedValidTermString = EncodingUtils.DecodeData(validTermString);
+
+                validTerm = DateTime.Parse(decodedValidTermString);
+            }
+            catch
+            {
+                throw new InvalidTokenException(INVALIDE_REFRESH_TOKEN_EXCEPTION);
+            }
 
             var validToken = claims.GenerateRefreshToken(validTerm);
 
-            return validToken.Equals(refreshToken) && DateTime.UtcNow < validTerm;
+            if (!validToken.Equals(refreshToken))
+            {
+                throw new InvalidTokenException(INVALIDE_REFRESH_TOKEN_EXCEPTION);
+            }
+
+            if (DateTime.UtcNow > validTerm)
+            {
+                throw new TokenExpiredException(TOKEN_EXPIRED_EXCEPTION);
+            }
+
+            return default;
         }
     }
 }

@@ -1,11 +1,10 @@
 ﻿@page "/account"
 @using BlazorBootstrap
+@using Contracts;
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 @using PB_Blazor.Services;
 
 @inject UserManager _userManager
-@inject ProtectedLocalStorage _storage
-@inject NavigationManager _navigationManager
 
 <div class="container">
 
@@ -21,6 +20,29 @@
         <div class="form-outline mb-4">
             <button type="button" @onclick="LogOut" class="btn btn-danger btn-block mb-4">Log out</button>
         </div>
+
+        <div class="form-outline mb-4">
+
+            <h3>Select repositoryType</h3>
+
+            <select class="form-control" @bind="@repositoryType">
+
+                @foreach (var repositoryTypeItem in (RepositoryType[])Enum.GetValues(typeof(RepositoryType)))
+                {
+                    <option value="@repositoryTypeItem"> @repositoryTypeItem.ToString() </option>
+                }
+
+            </select>
+        </div>
+
+        <div class="form-outline mb-4">
+            <button type="button" @onclick="SaveChanges" class="btn btn-primary btn-block mb-4">Save changes</button>
+        </div>
+
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <div class="alert alert-danger mb-4">@error</div>
+        }     
     }
     else
     {
@@ -28,7 +50,7 @@
         {
             <h2 class="mb-5 px-5 py-3 form-header">Login</h2>
 
-            <EditForm Model="@userLogin" OnSubmit="@OnLoginAsync">
+            <EditForm Model="@userLogin" OnSubmit="@Login">
 
                 <DataAnnotationsValidator />
 
@@ -54,7 +76,7 @@
 
                 @if (!string.IsNullOrEmpty(error))
                 {
-                    <div class="alert alert-danger mt-3 mb-0">@error</div>
+                    <div class="alert alert-danger mb-4">@error</div>
                 }
 
             </EditForm>
@@ -63,7 +85,7 @@
         {
             <h2 class="mb-5 px-5 py-3 form-header">Registration</h2>
 
-            <EditForm Model="@userRegistration" OnSubmit="@OnRegistrationAsync">
+            <EditForm Model="@userRegistration" OnSubmit="@Registration">
 
                 <DataAnnotationsValidator />
 
@@ -115,7 +137,7 @@
 
                 @if (!string.IsNullOrEmpty(error))
                 {
-                    <div class="alert alert-danger mt-3 mb-0">@error</div>
+                    <div class="alert alert-danger mb-4">@error</div>
                 }
 
             </EditForm>

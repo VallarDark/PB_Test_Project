@@ -99,6 +99,11 @@ namespace Domain.Aggregates.UserAggregate
             return EncodingUtils.GetHashCode(Password).Equals(passwordHash);
         }
 
+        public bool DoesHavePermission(UserRoleType permission)
+        {
+            return Role.CompareTo(permission) >= 0;
+        }
+
         public User(
             PersonalData personalData,
             string nickName,

@@ -57,7 +57,9 @@ namespace PB_WebApi.Controllers
             var userInfo = new UserInfoDto
             {
                 TokenDto = result,
-                UserName = _userService.CurrentUser?.NickName
+                UserName = _userService.CurrentUser?.NickName,
+                UserRole = _userService.CurrentUser?.Role?.RoleType,
+                RepositoryType = _userService.CurrentUser?.RepositoryType
             };
 
             return Ok(userInfo);
@@ -84,7 +86,9 @@ namespace PB_WebApi.Controllers
             var userInfo = new UserInfoDto
             {
                 TokenDto = result,
-                UserName = _userService.CurrentUser?.NickName
+                UserName = _userService.CurrentUser?.NickName,
+                UserRole = _userService.CurrentUser?.Role?.RoleType,
+                RepositoryType = _userService.CurrentUser?.RepositoryType
             };
 
             return Ok(userInfo);
@@ -135,7 +139,7 @@ namespace PB_WebApi.Controllers
 
             await _userService.ChangeRepositoryType(repositoryType);
 
-            return Ok("Repository changed");
+            return Ok(repositoryType);
         }
     }
 }
