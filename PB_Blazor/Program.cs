@@ -11,7 +11,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddBlazorBootstrap();
 builder.Services.AddScoped<UserManager>();
 builder.Services.AddScoped<ProductsManager>();
-builder.Services.AddSingleton<RequestSender>();
+builder.Services.AddScoped<RequestSender>();
 builder.Services.AddSingleton<RoutingManager>();
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
@@ -19,9 +19,7 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
     options.MinimumSameSitePolicy = SameSiteMode.None;
 });
 
-
 var app = builder.Build();
-
 
 if (!app.Environment.IsDevelopment())
 {

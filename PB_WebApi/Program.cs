@@ -1,5 +1,6 @@
 using PB_WebApi.ErrorHandler;
 using PB_WebApi.Utils;
+using Serilog;
 using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,12 @@ builder.Services.AddControllers();
 builder.Services.AddConfiguredCors();
 builder.Services.AddScoped<ExceptionMiddleware>();
 builder.Services.AddLogging();
+
+builder.Host.UseSerilog(
+    (ctx, lc) => lc
+    .MinimumLevel.Error()
+    .WriteTo.Console()
+    .WriteTo.File("Logs//log.json"));
 
 builder.Services.AddHsts(options =>
 {

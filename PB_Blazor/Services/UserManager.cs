@@ -1,6 +1,5 @@
 ﻿using Contracts;
 using Domain.Aggregates.UserAggregate;
-using Domain.Exceptions;
 using Domain.Utils;
 using PresentationModels.Models;
 
@@ -15,10 +14,6 @@ namespace PB_Blazor.Services
         private readonly RequestSender _sender;
         private readonly RoutingManager _routingManager;
 
-        private bool isRefreshTokenFailed;
-
-        public bool IsRefreshTokenFailed => isRefreshTokenFailed;
-
         public UserInfoDto? UserInfo { get; private set; }
 
         public bool IsAuthorized => UserInfo != null
@@ -30,7 +25,14 @@ namespace PB_Blazor.Services
         {
             _sender = sender;
             _routingManager = routingManager;
-            isRefreshTokenFailed = false;
+            _sender.OnTokenExpired += RefreshToken;
+            _sender.OnTokenInvalid += LogOut;
+        }
+
+        ~UserManager()
+        {
+            _sender.OnTokenExpired -= RefreshToken;
+            _sender.OnTokenInvalid -= LogOut;
         }
 
         public async Task<UserInfoDto?> LogIn(UserLoginModel? userLogin)
@@ -38,11 +40,15 @@ namespace PB_Blazor.Services
             var requestUrl =
                 _routingManager.GetRoute(RoutingManager.Endpoint.Login);
 
-            UserInfo = await _sender.Send<UserInfoDto>(
-                requestUrl,
-                null,
-                RequestSender.RequestType.HttpPost,
-                userLogin);
+            var request = new RequestSender.Request
+            {
+                Url = requestUrl,
+                AuthToken = null,
+                Type = RequestSender.RequestType.HttpPost,
+                Data = userLogin
+            };
+
+            UserInfo = await _sender.Send<UserInfoDto>(request);
 
             OnUserInfoChanged?.Invoke();
             OnLogin?.Invoke();
@@ -61,16 +67,25 @@ namespace PB_Blazor.Services
             OnUserInfoChanged?.Invoke();
         }
 
+        public void SetUserInfoFromLocale(UserInfoDto? userInfoDto)
+        {
+            UserInfo = userInfoDto;
+        }
+
         public async Task<UserInfoDto?> Registration(UserRegistrationModel? userRegistration)
         {
             var requestUrl =
                 _routingManager.GetRoute(RoutingManager.Endpoint.Registration);
 
-            UserInfo = await _sender.Send<UserInfoDto>(
-                requestUrl,
-                null,
-                RequestSender.RequestType.HttpPost,
-                userRegistration);
+            var request = new RequestSender.Request
+            {
+                Url = requestUrl,
+                AuthToken = null,
+                Type = RequestSender.RequestType.HttpPost,
+                Data = userRegistration
+            };
+
+            UserInfo = await _sender.Send<UserInfoDto>(request);
 
             OnUserInfoChanged?.Invoke();
 
@@ -84,80 +99,92 @@ namespace PB_Blazor.Services
             var requestUrl =
                 _routingManager.GetRoute(RoutingManager.Endpoint.ChangeRepository);
 
-            RepositoryType? result = null;
-
-            try
+            var request = new RequestSender.Request
             {
-                result = await _sender.Send<RepositoryType>(
-                    requestUrl,
-                    UserInfo.TokenDto?.Token,
-                    RequestSender.RequestType.HttpPost,
-                    repositoryType);
+                Url = requestUrl,
+                AuthToken = UserInfo.TokenDto?.Token,
+                Type = RequestSender.RequestType.HttpPost,
+                Data = repositoryType
+            };
 
-                UserInfo.RepositoryType = result;
+            var result = await _sender.Send<RepositoryType>(request);
 
-                OnUserInfoChanged?.Invoke();
-            }
-            catch (TokenExpiredException)
-            {
-                await RefreshToken();
+            UserInfo.RepositoryType = result;
 
-                if (!isRefreshTokenFailed)
-                {
-                    await ChangeRepositoryType(repositoryType);
-                }
-            }
+            OnUserInfoChanged?.Invoke();
 
             return UserInfo;
         }
 
-        public async Task<UserInfoDto?> RefreshToken(string? returnUrl = null)
+        public async Task<UserInfoDto?> RefreshToken()
         {
             EnsuredUtils.EnsureNotNull(UserInfo);
+
+            return await RefreshToken(UserInfo.TokenDto);
+        }
+
+        public async Task<UserInfoDto?> RefreshToken(TokenDto tokenDto)
+        {
+            EnsuredUtils.EnsureNotNull(tokenDto);
 
             var requestUrl =
                 _routingManager.GetRoute(RoutingManager.Endpoint.RefreshToken);
 
             var refreshTokenData = new RefreshTokenModel
             {
-                RefreshToken = UserInfo.TokenDto.RefreshToken,
-                Token = UserInfo.TokenDto.Token
+                RefreshToken = tokenDto.RefreshToken,
+                Token = tokenDto.Token
+            };
+
+            var request = new RequestSender.Request
+            {
+                Url = requestUrl,
+                AuthToken = null,
+                Type = RequestSender.RequestType.HttpPost,
+                Data = refreshTokenData
             };
 
             TokenDto? result = null;
 
             try
             {
-                isRefreshTokenFailed = false;
-
-                result = await _sender.Send<TokenDto>(
-                    requestUrl,
-                    null,
-                    RequestSender.RequestType.HttpPost,
-                    refreshTokenData);
+                result = await _sender.Send<TokenDto>(request);
 
                 UserInfo.TokenDto = result;
-
-                OnUserInfoChanged?.Invoke();
-            }
-            catch (TokenExpiredException)
-            {
-                OnRefreshTokenExpired?.Invoke(returnUrl);
-                throw;
             }
             catch
             {
-                isRefreshTokenFailed = true;
-                LogOut();
+                UserInfo = null;
+            }
+            finally
+            {
+                OnUserInfoChanged?.Invoke();
             }
 
             return UserInfo;
         }
 
-        public void LogOut()
+        public async Task LogOut()
         {
-            UserInfo = null;
-            OnUserInfoChanged?.Invoke();
+            var requestUrl =
+                _routingManager.GetRoute(RoutingManager.Endpoint.LogOut);
+
+            var request = new RequestSender.Request
+            {
+                Url = requestUrl,
+                AuthToken = UserInfo.TokenDto?.Token,
+                Type = RequestSender.RequestType.HttpPost,
+                Data = null
+            };
+            try
+            {
+                await _sender.Send<string>(request);
+            }
+            finally
+            {
+                UserInfo = null;
+                OnUserInfoChanged?.Invoke();
+            }
         }
     }
 }

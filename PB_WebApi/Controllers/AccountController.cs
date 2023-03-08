@@ -136,7 +136,6 @@ namespace PB_WebApi.Controllers
         [Authorize]
         public async Task<IActionResult> ChangeRepository([FromBody] RepositoryType repositoryType)
         {
-
             await _userService.ChangeRepositoryType(repositoryType);
 
             return Ok(repositoryType);

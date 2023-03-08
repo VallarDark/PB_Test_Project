@@ -10,6 +10,8 @@ namespace PB_Blazor.Services
 {
     public class RequestSender
     {
+        #region Constants
+
         private const string BAD_REQUEST_DATA =
             "Bad request data";
 
@@ -25,8 +27,17 @@ namespace PB_Blazor.Services
         private const string URL_PATTERN =
             @"(www|http:|https:)+[^\s]+[\w]";
 
+        #endregion
 
+        private readonly IConfiguration _configuration;
         private readonly Regex _urlRegex;
+
+        public event Func<Task<UserInfoDto?>>? OnTokenExpired;
+        public event Func<Task>? OnTokenInvalid;
+        private bool isTokenExpired;
+        private bool isLoggedOut;
+
+        #region InnerItems
 
         public enum RequestType
         {
@@ -36,41 +47,38 @@ namespace PB_Blazor.Services
             HttpDelete
         }
 
-        private readonly IConfiguration _configuration;
+        public class Request
+        {
+            public string? Url { get; set; }
+
+            public string? AuthToken { get; set; }
+
+            public RequestType Type { get; set; }
+
+            public object? Data { get; set; }
+        }
+
+        #endregion
 
         public RequestSender(IConfiguration configuration)
         {
             _configuration = configuration;
             _urlRegex = new Regex(URL_PATTERN);
+            isTokenExpired = false;
+            isLoggedOut = false;
         }
 
-        public async Task<T?> Send<T>(
-            string requestUrl,
-            string? authToken,
-            RequestType requestType,
-            object? requestData)
+        public async Task<T?> Send<T>(Request request)
         {
+            EnsuredUtils.EnsureNotNull(request);
 
-            EnsuredUtils.EnsureStringIsNotEmptyAndMathPattern(requestUrl, _urlRegex, BAD_REQUEST_DATA);
+            EnsuredUtils.EnsureStringIsNotEmptyAndMathPattern(request.Url, _urlRegex);
 
-            HttpResponseMessage? response;
-
-            if (requestData != null)
-            {
-                response = await SendRequest(
-                    requestUrl,
-                    authToken,
-                    requestType,
-                    JsonContent.Create(requestData));
-            }
-            else
-            {
-                response = await SendRequest(
-                    requestUrl,
-                    authToken,
-                    requestType,
-                    null);
-            }
+            var response = await SendRequest(
+            request.Url,
+            request.AuthToken,
+            request.Type,
+            JsonContent.Create(request?.Data));
 
             EnsuredUtils.EnsureNotNull(response);
 
@@ -78,13 +86,68 @@ namespace PB_Blazor.Services
 
             if (!response.IsSuccessStatusCode)
             {
+                if (response.Headers.Any(h => h.Key == "Invalid-Token"))
+                {
+                    if (OnTokenInvalid != null && !isLoggedOut)
+                    {
+                        isLoggedOut = true;
+
+                        try
+                        {
+                            await OnTokenInvalid.Invoke();
+                        }
+                        finally
+                        {
+                            isLoggedOut = false;
+                        }
+                    }
+
+                    throw new UnauthorizedAccessException(UNAUTHORIZED_EXCEPTION);
+                }
+
                 if (response.Headers.Any(h => h.Key == "Token-Expired"))
                 {
-                    throw new TokenExpiredException(TOKEN_EXPIRED_EXCEPTION);
+                    if (OnTokenExpired != null
+                        && !isTokenExpired
+                        && !isLoggedOut)
+                    {
+                        isTokenExpired = true;
+
+                        var uerInfo = await OnTokenExpired.Invoke();
+
+                        request.AuthToken = uerInfo?.TokenDto?.Token;
+
+                        try
+                        {
+                            return await Send<T>(request);
+                        }
+                        finally
+                        {
+                            isTokenExpired = false;
+                        }
+                    }
+                    else
+                    {
+                        throw new UnauthorizedAccessException(UNAUTHORIZED_EXCEPTION);
+                    }
                 }
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
+                    if (OnTokenInvalid != null && !isLoggedOut)
+                    {
+                        isLoggedOut = true;
+
+                        try
+                        {
+                            await OnTokenInvalid.Invoke();
+                        }
+                        finally
+                        {
+                            isLoggedOut = false;
+                        }
+                    }
+
                     throw new UnauthorizedAccessException(UNAUTHORIZED_EXCEPTION);
                 }
 

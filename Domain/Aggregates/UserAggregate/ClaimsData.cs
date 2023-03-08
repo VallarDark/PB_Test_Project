@@ -1,9 +1,10 @@
 ﻿using Domain.Exceptions;
 using Domain.Utils;
+using Newtonsoft.Json;
+using Serilog;
 using System;
 using System.Linq;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace Domain.Aggregates.UserAggregate
@@ -13,7 +14,9 @@ namespace Domain.Aggregates.UserAggregate
         private const string TOKEN_SEPARATOR = "|_|_|";
         private const string INVALIDE_TOKEN_EXCEPTION = "Refresh token is invalid";
         private const string INVALIDE_REFRESH_TOKEN_EXCEPTION = "Refresh token is invalid";
-        private const string TOKEN_EXPIRED_EXCEPTION = "Refresh token has been expired";
+        private const string REFRESH_TOKEN_EXPIRED_EXCEPTION = "Refresh token has been expired";
+
+        public const int REFRESH_TOKEN_LIFE_TIME_MINUTES = 60;
 
         private bool isEncrypted;
 
@@ -127,7 +130,14 @@ namespace Domain.Aggregates.UserAggregate
                 false);
         }
 
-        public string GenerateRefreshToken(DateTime validUntilTerm)
+        public string GenerateRefreshToken()
+        {
+            var validUntilTermTotalMinutes = GetTotalMinutesNow();
+
+            return GenerateRefreshToken(validUntilTermTotalMinutes);
+        }
+
+        public string GenerateRefreshToken(int validUntilTerm)
         {
             var claims = this;
 
@@ -136,46 +146,39 @@ namespace Domain.Aggregates.UserAggregate
                 claims = DecryptData();
             }
 
-            var validUntilTermString = validUntilTerm.ToString("MM/dd/yyyy h:mm tt");
+            var validUntilTermString = validUntilTerm.ToString();
 
             var stringBuilder = new StringBuilder();
 
-            stringBuilder.AppendLine(claims.Name);
-            stringBuilder.AppendLine(claims.LastName);
-            stringBuilder.AppendLine(claims.Email);
-            stringBuilder.AppendLine(claims.SessionToken);
-            stringBuilder.AppendLine(claims.RoleType);
-            stringBuilder.AppendLine(claims.Password);
+            stringBuilder.Append(claims.Name);
+            stringBuilder.Append(claims.LastName);
+            stringBuilder.Append(claims.Email);
+            stringBuilder.Append(claims.SessionToken);
+            stringBuilder.Append(claims.RoleType);
+            stringBuilder.Append(claims.Password);
             stringBuilder.Append(validUntilTermString);
 
             var data = stringBuilder.ToString();
-
-            using var hashManager = SHA256.Create();
-
-            var hash = hashManager.ComputeHash(
-                EncodingUtils.AltDataEncoding.GetBytes(data));
-
             stringBuilder.Clear();
 
-            foreach (var b in hash)
-            {
-                stringBuilder.Append(b.ToString("x2"));
-            }
-
-            stringBuilder.AppendLine(TOKEN_SEPARATOR);
+            stringBuilder.Append(EncodingUtils.GetHashCode(data));
+            stringBuilder.Append(TOKEN_SEPARATOR);
             stringBuilder.Append(EncodingUtils.EncodeData(validUntilTermString));
 
             return stringBuilder.ToString();
         }
 
-        public static Guid ValidateRefreshToken(string refreshToken, ClaimsData? claims)
+        public static Guid ValidateRefreshToken(
+            string refreshToken,
+            ClaimsData? claims,
+            ILogger? logger = null)
         {
             if (claims == null)
             {
                 throw new InvalidTokenException(INVALIDE_TOKEN_EXCEPTION);
             }
 
-            DateTime validTerm = DateTime.MinValue;
+            int validTermTotalMinutes = 0;
 
             try
             {
@@ -185,26 +188,38 @@ namespace Domain.Aggregates.UserAggregate
 
                 var decodedValidTermString = EncodingUtils.DecodeData(validTermString);
 
-                validTerm = DateTime.Parse(decodedValidTermString);
+                validTermTotalMinutes = int.Parse(decodedValidTermString);
             }
-            catch
+            catch (Exception ex)
             {
-                throw new InvalidTokenException(INVALIDE_REFRESH_TOKEN_EXCEPTION);
+                logger?.Error(ex.Message);
+                throw new InvalidRefreshTokenException(INVALIDE_REFRESH_TOKEN_EXCEPTION);
             }
 
-            var validToken = claims.GenerateRefreshToken(validTerm);
+            var validToken = claims.GenerateRefreshToken(validTermTotalMinutes);
 
             if (!validToken.Equals(refreshToken))
             {
-                throw new InvalidTokenException(INVALIDE_REFRESH_TOKEN_EXCEPTION);
+                logger?.Error($"Valid token not equal to refresh" +
+                    $" \n refresh: {refreshToken} valid: {validToken}" +
+                    $" \n claims:{JsonConvert.SerializeObject(claims)} ");
+
+                throw new InvalidRefreshTokenException(INVALIDE_REFRESH_TOKEN_EXCEPTION);
             }
 
-            if (DateTime.UtcNow > validTerm)
+            var totalMinutesNow = GetTotalMinutesNow();
+
+            if (totalMinutesNow - REFRESH_TOKEN_LIFE_TIME_MINUTES > validTermTotalMinutes)
             {
-                throw new TokenExpiredException(TOKEN_EXPIRED_EXCEPTION);
+                throw new InvalidRefreshTokenException(REFRESH_TOKEN_EXPIRED_EXCEPTION);
             }
 
             return default;
+        }
+
+        private static int GetTotalMinutesNow()
+        {
+            return (int)DateTime.UtcNow.Subtract(DateTime.MinValue).TotalMinutes;
         }
     }
 }

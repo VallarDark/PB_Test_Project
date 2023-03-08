@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Domain.Utils
@@ -35,12 +36,18 @@ namespace Domain.Utils
 
         public static string GetHashCode(string? data)
         {
-            if (string.IsNullOrEmpty(data))
+            var stringBuilder = new StringBuilder();
+
+            using (SHA256 hashManager = SHA256.Create())
             {
-                return string.Empty;
+                Encoding enc = Encoding.UTF8;
+                var result = hashManager.ComputeHash(enc.GetBytes(data ?? ""));
+
+                foreach (var item in result)
+                    stringBuilder.Append(item.ToString("x2"));
             }
 
-            return data.GetHashCode().ToString();
+            return stringBuilder.ToString();
         }
     }
 }

@@ -30,9 +30,10 @@ namespace PB_WebApi.ErrorHandler
                 context.Response.Headers.Add("Low-Privileges-Level", "true");
             }
 
-            if (ex is TokenExpiredException)
+            if (ex is InvalidTokenException
+                || ex is InvalidRefreshTokenException)
             {
-                context.Response.Headers.Add("Token-Expired", "true");
+                context.Response.Headers.Add("Invalid-Token", "true");
             }
 
             if (ex is EmptyCollectionException
@@ -45,6 +46,7 @@ namespace PB_WebApi.ErrorHandler
                     || ex is TokenExpiredException
                     || ex is WrongCollectionItemsCountException
                     || ex is WrongOperationException
+                    || ex is InvalidRefreshTokenException
                     || ex is ArgumentException)
             {
                 await context.Response.WriteAsync(new ErrorDetails()

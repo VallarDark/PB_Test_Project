@@ -1,6 +1,5 @@
 ﻿using Contracts;
 using Domain.Aggregates.ProductAggregate;
-using Domain.Exceptions;
 using Domain.Utils;
 
 namespace PB_Blazor.Services
@@ -23,32 +22,23 @@ namespace PB_Blazor.Services
 
         public async Task<PaginatedCollectionBase<Product>?> GetProducts(int pageNumber)
         {
-            EnsuredUtils.EnsureNotNull(_userManager);
-            EnsuredUtils.EnsureNotNull(_userManager.UserInfo);
+            EnsuredUtils.EnsureNotNull(_userManager?.UserInfo);
             EnsuredUtils.EnsureNumberIsMoreOrEqualValue(pageNumber, 1);
 
             var requestUrl =
                 _routingManager.GetRoute(RoutingManager.Endpoint.GetProducts, pageNumber.ToString());
 
+            var request = new RequestSender.Request
+            {
+                Url = requestUrl,
+                AuthToken = _userManager?.UserInfo.TokenDto?.Token,
+                Type = RequestSender.RequestType.HttpGet,
+                Data = null
+            };
+
             PaginatedCollectionBase<Product>? result = null;
 
-            try
-            {
-                result = await _sender.Send<PaginatedCollectionBase<Product>>(
-                    requestUrl,
-                    _userManager?.UserInfo?.TokenDto?.Token,
-                    RequestSender.RequestType.HttpGet,
-                    null);
-            }
-            catch (TokenExpiredException)
-            {
-                await _userManager.RefreshToken("products");
-
-                if (!_userManager.IsRefreshTokenFailed)
-                {
-                    await GetProducts(pageNumber);
-                }
-            }
+            result = await _sender.Send<PaginatedCollectionBase<Product>>(request);
 
             return result;
         }

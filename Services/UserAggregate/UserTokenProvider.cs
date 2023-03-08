@@ -3,6 +3,7 @@ using Domain.Exceptions;
 using Domain.Utils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -15,19 +16,23 @@ namespace Services.UserAggregate
         private const string TOKEN_EXPIRED_EXCEPTION = "Token has been expired";
         private const string INVALIDE_USER_DATA_EXCEPTION = "Invalid user data";
 
-        private const int TOKEN_LIFE_TIME_MINUTES = 5;
-        private const int REFRESH_TOKEN_LIFE_TIME_MINUTES = 60;
+        public const int TOKEN_LIFE_TIME_MINUTES = 1;
+
 
         private readonly string? _issuer;
         private readonly string? _audience;
         private readonly byte[] _key;
+        private readonly ILogger _logger;
 
-        public UserTokenProvider(IConfiguration configuration)
+
+        public UserTokenProvider(IConfiguration configuration, ILogger logger)
         {
             _issuer = configuration["JWT:Issuer"];
             _audience = configuration["JWT:Audience"];
             _key = EncodingUtils.AltDataEncoding.GetBytes(
                 configuration["JWT:Key"] ?? string.Empty);
+
+            _logger = logger;
         }
 
         public TokenDto? GenerateToken(User user)
@@ -38,12 +43,10 @@ namespace Services.UserAggregate
 
             EnsuredUtils.EnsureNotNull(claimsData);
 
-            var refreshTokenExpires = DateTime.UtcNow.AddMinutes(REFRESH_TOKEN_LIFE_TIME_MINUTES);
-
             return new TokenDto
             {
                 Token = GenerateToken(claimsData),
-                RefreshToken = claimsData.GenerateRefreshToken(refreshTokenExpires)
+                RefreshToken = claimsData.GenerateRefreshToken()
             };
 
         }
@@ -94,6 +97,8 @@ namespace Services.UserAggregate
 
             if (!tokenHandler.CanReadToken(tokenData.Token))
             {
+                _logger.Error("Can`t Read Token");
+
                 throw new InvalidTokenException(INVALIDE_TOKEN_EXCEPTION);
             }
 
@@ -106,8 +111,10 @@ namespace Services.UserAggregate
                     validationParameters,
                     out var _);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.Error(ex.Message);
+
                 throw new InvalidTokenException(INVALIDE_TOKEN_EXCEPTION);
             }
 
@@ -115,7 +122,7 @@ namespace Services.UserAggregate
 
             EnsuredUtils.EnsureNotNull(claimsData);
 
-            ClaimsData.ValidateRefreshToken(tokenData.RefreshToken, claimsData);
+            ClaimsData.ValidateRefreshToken(tokenData.RefreshToken, claimsData, _logger);
 
             return new TokenDto
             {

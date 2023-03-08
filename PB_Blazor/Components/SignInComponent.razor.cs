@@ -14,18 +14,22 @@ namespace PB_Blazor.Components
 
         private async void LogOut()
         {
-            await _storage.SetAsync(nameof(UserInfoDto), null);
-            _userManager.LogOut();
+            await _userManager.LogOut();
             GoToAccount();
         }
 
-        protected override async Task OnAfterRenderAsync(bool _)
+        protected override async Task OnAfterRenderAsync(bool isFirst)
         {
-            var userInfoDto = (await _storage.GetAsync<UserInfoDto>(nameof(UserInfoDto))).Value;
-
-            if (userInfoDto != null)
+            if (isFirst)
             {
-                _userManager.LogIn(userInfoDto);
+                var userInfoDto = (await _storage.GetAsync<UserInfoDto>(nameof(UserInfoDto))).Value;
+
+                if (userInfoDto != null)
+                {
+                    _userManager.SetUserInfoFromLocale(userInfoDto);
+
+                    await _userManager.RefreshToken(userInfoDto.TokenDto);
+                }
             }
         }
 
@@ -37,6 +41,7 @@ namespace PB_Blazor.Components
         private async void UpdateLocaleUserInfo()
         {
             await _storage.SetAsync(nameof(UserInfoDto), _userManager.UserInfo);
+            StateHasChanged();
         }
 
         private async void NavigateToReturnUrl()
@@ -58,7 +63,6 @@ namespace PB_Blazor.Components
 
         protected override void OnInitialized()
         {
-            _userManager.OnUserInfoChanged += StateHasChanged;
             _userManager.OnUserInfoChanged += UpdateLocaleUserInfo;
             _userManager.OnLogin += NavigateToReturnUrl;
             _userManager.OnRefreshTokenExpired += SaveReturnUrl;
@@ -66,7 +70,6 @@ namespace PB_Blazor.Components
 
         public void Dispose()
         {
-            _userManager.OnUserInfoChanged -= StateHasChanged;
             _userManager.OnUserInfoChanged -= UpdateLocaleUserInfo;
             _userManager.OnLogin -= NavigateToReturnUrl;
             _userManager.OnRefreshTokenExpired -= SaveReturnUrl;
